@@ -21,10 +21,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -767,13 +767,12 @@ def run(code, view, filename='untitled'):
 	stripped_lines = []
 	good_lines = []
 	lines = code.split('\n')
-	for i in xrange(len(lines)):
-		line = lines[i]
+	for i, line in enumerate(lines):
 		if not line.strip() or line.strip().startswith('#'):
 			stripped_lines.append(i)
 		else:
 			good_lines.append(line)
-		
+
 	text = '\n'.join(good_lines)
 	errors = check(text, filename)
 
@@ -790,7 +789,7 @@ def run(code, view, filename='untitled'):
 	def underlineRegex(lineno, regex, wordmatch=None, linematch=None):
 		lines.add(lineno)
 		offset = 0
-		
+
 		line = view.full_line(view.text_point(lineno, 0))
 		lineText = view.substr(line)
 		if linematch:
@@ -807,24 +806,24 @@ def run(code, view, filename='untitled'):
 
 		for start, end in results:
 			underlineRange(lineno, start+offset, end-start)
-	
+
 	def underlineWord(lineno, word):
 		regex = r'((and|or|not|if|elif|while|in)\s+|[+\-*^%%<>=\(\{])*\s*(?P<underline>[\w\.]*%s[\w]*)' % (word)
 		underlineRegex(lineno, regex, word)
-	
+
 	def underlineImport(lineno, word):
 		linematch = '(from\s+[\w_\.]+\s+)?import\s+(?P<match>[^#;]+)'
 		regex = '(^|\s+|,\s*|as\s+)(?P<underline>[\w]*%s[\w]*)' % word
 		underlineRegex(lineno, regex, word, linematch)
-	
+
 	def underlineForVar(lineno, word):
 		regex = 'for\s+(?P<underline>[\w]*%s[\w*])' % word
 		underlineRegex(lineno, regex, word)
-	
+
 	def underlineDuplicateArgument(lineno, word):
 		regex = 'def [\w_]+\(.*?(?P<underline>[\w]*%s[\w]*)' % word
 		underlineRegex(lineno, regex, word)
-	
+
 	errorMessages = {}
 	def addMessage(lineno, message):
 		message = str(message)
@@ -838,18 +837,24 @@ def run(code, view, filename='untitled'):
 		for i in stripped_lines:
 			if error.lineno >= i:
 				error.lineno += 1
-		
+
 		lines.add(error.lineno)
 		addMessage(error.lineno, error)
 		if isinstance(error, OffsetError):
 			underlineRange(error.lineno, error.offset)
+			# if len(errors) == 1 and False:
+			# 	outlines = [view.full_line(view.text_point(error.lineno, 0)) for lineno in lines]
+			# 	return outlines, underline, errorMessages, False
 
 		elif isinstance(error, PythonError):
-			pass
+			# if len(errors) == 1 and False:
+			# 	outlines = [view.full_line(view.text_point(error.lineno, 0)) for lineno in lines]
+			# 	return outlines, underline, errorMessages, False
+			underlineRange(error.lineno, error.offset) ## ?? is this the right thing to do??
 
 		elif isinstance(error, messages.UnusedImport):
 			underlineImport(error.lineno, error.name)
-		
+
 		elif isinstance(error, messages.RedefinedWhileUnused):
 			underlineWord(error.lineno, error.name)
 
@@ -882,5 +887,5 @@ def run(code, view, filename='untitled'):
 
 		else:
 			print 'Oops, we missed an error type!'
-	
-	return underline, lines, errorMessages, True
+
+	return underline, lines, errorMessages
