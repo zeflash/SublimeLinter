@@ -18,16 +18,13 @@ from sublimelint.loader import Loader
 
 
 LINTERS = {} # mapping of language name to linter module
-QUEUE = {}   # views waiting to be processed by linter
-ERRORS = {}  # error messages on given line obtained from linter; they are
-             # displayed in the status bar when cursor is on line with error
-HELP = []    # collects all "help" (docstring, etc.) information
+QUEUE = {}     # views waiting to be processed by linter
+ERRORS = {} # error messages on given line obtained from linter; they are
+            # displayed in the status bar when cursor is on line with error
+HELP = []   # collects all "help" (docstring, etc.) information
 MOD_LOAD = Loader(os.getcwd(), LINTERS, HELP) # utility to load (and reload
-             # if necessary) linter modules [useful when working on plugin]
-INTERVAL = 0.5 # time interval between background runs
+            # if necessary) linter modules [useful when working on plugin]
 
-#TODO have interval set via user preference
-#TODO add info about theme
 
 
 HELP.insert(0,
@@ -41,7 +38,36 @@ can be quickly located.
 
 To enable a background linter to run by default
 (provided one exists for the language/syntax the file being viewed), set
-the user preference "sublimelint" to true.
+the user preference "sublimelint" to true.   If you find that this slows
+down the UI too much, you can unset this user preference (or set it to
+false) and use the special commands (described below) to run it only
+on demand.
+
+
+Color: user notes
+------------------
+
+To customize the color used for highlighting user notes, add the following
+to your theme (adapting the color to your liking):
+        <dict>
+            <key>name</key>
+            <string>Sublimelint UserNotes</string>
+            <key>scope</key>
+            <string>sublimelint.notes</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#FFFFAA</string>
+            </dict>
+        </dict>
+
+Color: lint "errors"
+--------------------
+
+The color used to outline lint errors is the invalid.illegal scope
+which should normally be defined in your default theme.
+
+==================================================================
 
 The following information is extracted dynamically from the source
 code files and *should* be reflecting accurately all the available
@@ -56,12 +82,12 @@ def help_collector(fn):
     HELP.append(fn.__doc__)
     return fn
 
-def run(linter, view):
+def background_run(linter, view):
     '''run a linter on a given view if settings is set appropriately'''
     if view.settings().get('sublimelint'):
         if linter:
-            run_lint(linter, view)
-    if view.settings().get('sublimelint.notes'):
+            run_once(linter, view)
+    if view.settings().get('sublimelint_notes'):
         highlight_notes(view)
 
 def run_(linter, view):
@@ -72,7 +98,20 @@ def run_(linter, view):
 		filename = view.file_name() # os.path.split(view.file_name())[-1]
 	else:
 		filename = 'untitled'
+    underlines, lines, ERRORS[vid] = linter.run(text, view, filename)
+    add_lint_marks(view, underlines, lines)
 
+def run_once(linter, view):
+    '''run a linter on a given view regardless of user setting'''
+    if linter == LINTERS["user notes"]:
+        highlight_notes(view)
+        return
+    vid = view.id()
+    text = view.substr(sublime.Region(0, view.size()))
+    if view.file_name():
+        filename = view.file_name()
+    else:
+        filename = 'untitled'
     underlines, lines, ERRORS[vid] = linter.run(text, view, filename)
     add_lint_marks(view, underlines, lines)
 
@@ -107,10 +146,9 @@ def highlight_notes(view):
     '''highlight user-specified notes in a file'''
     view.erase_regions('user_notes')
     text = view.substr(sublime.Region(0, view.size()))
-
-    regions = LINTERS["user notes"].run(view, text)
+    regions = LINTERS["user notes"].run(text, view)
     if regions:
-        view.add_regions('user_notes', regions, "user.notes",
+        view.add_regions('user_notes', regions, "sublimelint.notes",
                                             sublime.DRAW_EMPTY_AS_OVERWRITE)
 
 def queue_linter(view):
@@ -127,13 +165,13 @@ def background_linter():
        update the view after running the linter in a background thread
        so as to not slow down the UI too much.'''
     while True:
-        time.sleep(INTERVAL)
+        time.sleep(0.5)
         for vid in dict(QUEUE):
             _view = QUEUE[vid]
             def _update_view():
                 linter = select_linter(_view)
                 try:
-                    run(linter, _view)
+                    background_run(linter, _view)
                 except RuntimeError, excp:
                     print excp
             sublime.set_timeout(_update_view, 100)
@@ -243,7 +281,7 @@ class Lint(sublime_plugin.TextCommand):
         '''runs an existing linter'''
         if self.view.settings().get('sublimelint'):
             self.view.settings().set('sublimelint', None)
-        run_lint(LINTERS[name], self.view)
+        run_once(LINTERS[name], self.view)
 
 
 
@@ -260,7 +298,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
     def on_load(self, view):
         linter = select_linter(view)
         if linter:
-            run(linter, view)
+            background_run(linter, view)
 
     def on_post_save(self, view):
         for name, module in LINTERS.items():
