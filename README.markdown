@@ -33,8 +33,11 @@ The "User" packages directory is located at:
 Using
 -----
 
-SublimeLint natively supports Python (using pyflakes) and supports using PHP via "php -l" if PHP is in your $PATH.
-There is also an option to use pylint (if present), instead of pyflakes.
+For detailed, up to date instructions, enter the following at the console
+
+    view.run_command("lint")
+or
+    view.run_command("lint", "help")
 
 1. To enable the plugin to work by default, you need to set a user preference "sublimelint" to true.
 2. You can turn on/off the linter via a command view.run_command("linter_on") (or "linter_off") - even if you have not set a user preference before.
@@ -45,3 +48,4 @@ Note that the linter normally works in a background thread and is constantly ref
 view.run_command("run_linter"), "LINTER") where "LINTER" is one of "Python", "PHP" or "pylint".
 4. If you run a linter via a commmand as in 3. above, the realtime linter is automatically disabled. To reset to its previous state (on or off) AND to clear all visible "errors", you use the command
 view.run_command("reset_linter").
+
