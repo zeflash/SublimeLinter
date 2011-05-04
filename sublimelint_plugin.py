@@ -104,13 +104,13 @@ def background_run(linter, view):
         highlight_notes(view)
 
 def run_(linter, view):
-	'''run a linter on a given view regardless of user setting'''
-	vid = view.id()
-	text = view.substr(sublime.Region(0, view.size()))
-	if view.file_name():
-		filename = view.file_name() # os.path.split(view.file_name())[-1]
-	else:
-		filename = 'untitled'
+    '''run a linter on a given view regardless of user setting'''
+    vid = view.id()
+    text = view.substr(sublime.Region(0, view.size()))
+    if view.file_name():
+        filename = view.file_name() # os.path.split(view.file_name())[-1]
+    else:
+        filename = 'untitled'
     underlines, lines, ERRORS[vid] = linter.run(text, view, filename)
     add_lint_marks(view, underlines, lines)
 
