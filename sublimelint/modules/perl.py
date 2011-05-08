@@ -10,13 +10,13 @@ def check(codeString, filename):
 		info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 		info.wShowWindow = subprocess.SW_HIDE
 
-	process = subprocess.Popen(('perl', '-c'), 
-								stdin=subprocess.PIPE, 
+	process = subprocess.Popen(('perl', '-c'),
+								stdin=subprocess.PIPE,
 								stdout=subprocess.PIPE,
 								stderr=subprocess.STDOUT,
 								startupinfo=info)
 	result = process.communicate(codeString)[0]
-	
+
 	return result
 
 # start sublimelint perl plugin
@@ -31,7 +31,7 @@ description =\
 
 def run(code, view, filename='untitled'):
 	errors = check(code, filename)
-	
+
 	lines = set()
 	underline = [] # leave this here for compatibility with original plugin
 
@@ -42,7 +42,7 @@ def run(code, view, filename='untitled'):
 			errorMessages[lineno].append(message)
 		else:
 			errorMessages[lineno] = [message]
-	
+
 	def underlineRange(lineno, position, length=1):
 		line = view.full_line(view.text_point(lineno, 0))
 		position += line.begin()
@@ -53,7 +53,7 @@ def run(code, view, filename='untitled'):
 	def underlineRegex(lineno, regex, wordmatch=None, linematch=None):
 		lines.add(lineno)
 		offset = 0
-		
+
 		line = view.full_line(view.text_point(lineno, 0))
 		lineText = view.substr(line)
 		if linematch:
