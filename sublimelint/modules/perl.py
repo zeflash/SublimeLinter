@@ -23,6 +23,11 @@ def check(codeString, filename):
 import re
 __all__ = ['run', 'language']
 language = 'Perl'
+description =\
+'''* view.run_command("lint", "Perl")
+        Turns background linter off and runs the default Perl linter
+        (perl - c, assumed to be on $PATH) on current view.
+'''
 
 def run(code, view, filename='untitled'):
 	errors = check(code, filename)
