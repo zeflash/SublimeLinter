@@ -13,7 +13,14 @@ def check(codeString, filename):
 								stdin=subprocess.PIPE, 
 								stdout=subprocess.PIPE, 
 								startupinfo=info)
-	result = process.communicate(codeString)[0]
+
+	plainText = codeString.encode("ascii", 'ignore')
+	try:
+		result = process.communicate(plainText)[0]
+	except:
+		return False
+	finally:
+		process.kill
 
 	return result
 
