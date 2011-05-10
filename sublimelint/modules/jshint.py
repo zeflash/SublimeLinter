@@ -10,8 +10,6 @@ def check(codeString, filename):
 		info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 		info.wShowWindow = subprocess.SW_HIDE
 
-	print filename
-
 	process = subprocess.Popen(('jshint', filename),
 								stdin=subprocess.PIPE,
 								stdout=subprocess.PIPE,
@@ -74,12 +72,9 @@ def run(code, view, filename='untitled'):
 			underlineRange(lineno, start+offset, end-start)
 
 	for line in errors:
-		print line
-		# match = re.match(r'(?P<error>.+?) at .+? line (?P<line>\d+)(, near "(?P<near>.+?)")?', line)
 		match = re.match(r'.* line (?P<line>\d+), col (?P<near>.+?)?, (?P<error>.+?)\.', line)
 
 		if match:
-			print match.groups()
 			error, line = match.group('error'), match.group('line')
 			lineno = int(line) - 1
 
