@@ -6,16 +6,15 @@ depending user choice.
 '''
 import sublime
 
-
-default_notes = ["TODO", "README"]
+default_notes = ["TODO", "README", "FIXME"]
 language = "annotations"
 description =\
 '''* view.run_command("lint", "annotations")
         Turns background linter off and highlight user notes.
 
-        User notes are "words" that can be specified as a user preference named "my_notes".
-        If no user preferences has been set, the following will be assumed:
-        my_notes = %s
+        User notes are "words" that can be specified as a user preference named
+        "annotations". If no user preferences has been set, the following will
+        be assumed: annotations = %s
 ''' % default_notes
 
 def run(code, view):
@@ -79,6 +78,3 @@ def find_all(text, string, view):
         else:
             break
     return found
-
-
-

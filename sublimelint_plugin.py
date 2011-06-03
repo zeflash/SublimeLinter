@@ -75,8 +75,28 @@ to your theme (adapting the color to your liking):
                 <string>#FFFFAA</string>
             </dict>
         </dict>
-
-
+        <dict>
+            <key>name</key>
+            <string>Sublimelint Outline</string>
+            <key>scope</key>
+            <string>sublimelint.illegal</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#ff4A4988</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
+            <string>Sublimelint Underline</string>
+            <key>scope</key>
+            <string>invalid.illegal</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#FF0000</string>
+            </dict>
+        </dict>
 
 ==================================================================
 
@@ -104,7 +124,7 @@ def background_run(linter, view):
 def run_(linter, view):
     '''run a linter on a given view regardless of user setting'''
     vid = view.id()
-    text = view.substr(sublime.Region(0, view.size()))
+    text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
     if view.file_name():
         filename = view.file_name() # os.path.split(view.file_name())[-1]
     else:
@@ -118,7 +138,7 @@ def run_once(linter, view):
         highlight_notes(view)
         return
     vid = view.id()
-    text = view.substr(sublime.Region(0, view.size()))
+    text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
     if view.file_name():
         filename = view.file_name()
     else:
@@ -130,13 +150,12 @@ def add_lint_marks(view, underlines, lines):
     '''Adds lint marks to view.'''
     erase_lint_marks(view)
 		
-    highlight_theme_scope = "invalid.illegal"
     if underlines:
-        view.add_regions('lint-underline', underlines, highlight_theme_scope,
+        view.add_regions('lint-underline', underlines, 'invalid.illegal',
                                             sublime.DRAW_EMPTY_AS_OVERWRITE)
     if lines:
         outlines = [view.full_line(view.text_point(nb, 0)) for nb in lines]
-        view.add_regions('lint-outlines', outlines, highlight_theme_scope,
+        view.add_regions('lint-outlines', outlines, 'sublimelint.illegal',
                                                     sublime.DRAW_OUTLINED)
 	
 def erase_lint_marks(view):
