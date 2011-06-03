@@ -16,10 +16,6 @@ import sublime_plugin
 
 from sublimelint.loader import Loader
 
-# TODO: experiment with including non-ascii characters - the Python linter
-# apparently raises some exceptions and may stop because of that.
-# If so, fix it!
-
 LINTERS = {} # mapping of language name to linter module
 QUEUE = {}     # views waiting to be processed by linter
 ERRORS = {} # error messages on given line obtained from linter; they are
@@ -214,7 +210,7 @@ def background_linter():
 if not '__active_linter_thread' in globals():
     __active_linter_thread = True
     thread.start_new_thread(background_linter, ())
-	
+
 
 UNRECOGNIZED = '''
 * Unrecognized option * :  %s
