@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 # python.py - Lint checking for Python - given filename and contents of the code:
 # It provides a list of line numbers to outline and offsets to highlight.
 #
 # This specific module is a derivative of PyFlakes and part of the SublimeLint project.
-# SublimeLint is (c) 2011 Ryan Hileman and licensed under the MIT license.
+# It is a fork by André Roberge from the original SublimeLint project,
+# (c) 2011 Ryan Hileman and licensed under the MIT license.
 # URL: http://bochs.info/
 #
 # The original copyright notices for this file/project follows:
@@ -21,10 +23,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -34,7 +36,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-# todo:
+# TODO:
 # * fix regex for variable names inside strings (quotes)
 
 import sublime
@@ -762,20 +764,25 @@ def check(codeString, filename):
 # start sublimelint python plugin
 
 import sys, re
-__all__ = ['run', 'language']
+
 language = 'Python'
+description =\
+'''* view.run_command("lint", "Python")
+        Turns background linter off and runs the default Python linter
+        (pyflakes) on current view.
+'''
+
 
 def run(code, view, filename='untitled'):
 	stripped_lines = []
 	good_lines = []
 	lines = code.split('\n')
-	for i in xrange(len(lines)):
-		line = lines[i]
+	for i, line in enumerate(lines):
 		if not line.strip() or line.strip().startswith('#'):
 			stripped_lines.append(i)
 		else:
 			good_lines.append(line)
-		
+
 	text = '\n'.join(good_lines)
 	errors = check(text, filename)
 
@@ -783,6 +790,12 @@ def run(code, view, filename='untitled'):
 	underline = []
 
 	def underlineRange(lineno, position, length=1):
+		# To underline a region, we use a "hack" specific to SublimeText
+		# where we create a list of empty regions for each character
+		# which we want to underline.  When drawing with
+		# sublime.DRAW_EMPTY_AS_OVERWRITE, such empty regions
+		# will appear as underlined.
+
 		line = view.full_line(view.text_point(lineno, 0))
 		position += line.begin()
 
@@ -792,7 +805,7 @@ def run(code, view, filename='untitled'):
 	def underlineRegex(lineno, regex, wordmatch=None, linematch=None):
 		lines.add(lineno)
 		offset = 0
-		
+
 		line = view.full_line(view.text_point(lineno, 0))
 		lineText = view.substr(line)
 		if linematch:
@@ -809,24 +822,24 @@ def run(code, view, filename='untitled'):
 
 		for start, end in results:
 			underlineRange(lineno, start+offset, end-start)
-	
+
 	def underlineWord(lineno, word):
 		regex = r'((and|or|not|if|elif|while|in)\s+|[+\-*^%%<>=\(\{])*\s*(?P<underline>[\w\.]*%s[\w]*)' % (word)
 		underlineRegex(lineno, regex, word)
-	
+
 	def underlineImport(lineno, word):
 		linematch = '(from\s+[\w_\.]+\s+)?import\s+(?P<match>[^#;]+)'
 		regex = '(^|\s+|,\s*|as\s+)(?P<underline>[\w]*%s[\w]*)' % word
 		underlineRegex(lineno, regex, word, linematch)
-	
+
 	def underlineForVar(lineno, word):
 		regex = 'for\s+(?P<underline>[\w]*%s[\w*])' % word
 		underlineRegex(lineno, regex, word)
-	
+
 	def underlineDuplicateArgument(lineno, word):
 		regex = 'def [\w_]+\(.*?(?P<underline>[\w]*%s[\w]*)' % word
 		underlineRegex(lineno, regex, word)
-	
+
 	errorMessages = {}
 	def addMessage(lineno, message):
 		message = str(message)
@@ -840,49 +853,33 @@ def run(code, view, filename='untitled'):
 		for i in stripped_lines:
 			if error.lineno >= i:
 				error.lineno += 1
-		
+
 		lines.add(error.lineno)
 		addMessage(error.lineno, error)
-		if isinstance(error, OffsetError):
+		if isinstance(error, (OffsetError, PythonError)):
 			underlineRange(error.lineno, error.offset)
-
-		elif isinstance(error, PythonError):
-			pass
-
-		elif isinstance(error, messages.UnusedImport):
-			underlineImport(error.lineno, error.name)
-		
-		elif isinstance(error, messages.RedefinedWhileUnused):
+		elif isinstance(error, (messages.RedefinedWhileUnused,
+								messages.UndefinedName,
+								messages.UndefinedExport,
+								messages.UndefinedLocal,
+								messages.RedefinedFunction,
+								messages.UnusedVariable)):
 			underlineWord(error.lineno, error.name)
 
 		elif isinstance(error, messages.ImportShadowedByLoopVar):
 			underlineForVar(error.lineno, error.name)
 
-		elif isinstance(error, messages.ImportStarUsed):
+		elif isinstance(error, (messages.UnusedImport,
+								messages.ImportStarUsed)):
 			underlineImport(error.lineno, '\*')
-
-		elif isinstance(error, messages.UndefinedName):
-			underlineWord(error.lineno, error.name)
-
-		elif isinstance(error, messages.UndefinedExport):
-			underlineWord(error.lineno, error.name)
-
-		elif isinstance(error, messages.UndefinedLocal):
-			underlineWord(error.lineno, error.name)
 
 		elif isinstance(error, messages.DuplicateArgument):
 			underlineDuplicateArgument(error.lineno, error.name)
 
-		elif isinstance(error, messages.RedefinedFunction):
-			underlineWord(error.lineno, error.name)
-
 		elif isinstance(error, messages.LateFutureImport):
 			pass
 
-		elif isinstance(error, messages.UnusedVariable):
-			underlineWord(error.lineno, error.name)
-
 		else:
 			print 'Oops, we missed an error type!'
-	
-	return underline, lines, errorMessages, True
+
+	return underline, lines, errorMessages

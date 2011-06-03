@@ -10,23 +10,23 @@ def check(codeString, filename):
 		info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 		info.wShowWindow = subprocess.SW_HIDE
 
-	process = subprocess.Popen(('perl', '-c'),
+	process = subprocess.Popen(('jshint', filename),
 								stdin=subprocess.PIPE,
 								stdout=subprocess.PIPE,
 								stderr=subprocess.STDOUT,
 								startupinfo=info)
-	result = process.communicate(codeString)[0]
 
-	return result
+	lines = process.stdout.readlines()
+	return lines
 
 # start sublimelint perl plugin
 import re
 __all__ = ['run', 'language']
-language = 'Perl'
+language = 'JavaScript'
 description =\
-'''* view.run_command("lint", "Perl")
-        Turns background linter off and runs the default Perl linter
-        (perl - c, assumed to be on $PATH) on current view.
+'''* view.run_command("lint", "JavaScript")
+        Turns background linter off and runs the JSHint linter
+        (jshint, assumed to be on $PATH) on current view.
 '''
 
 def run(code, view, filename='untitled'):
@@ -71,8 +71,8 @@ def run(code, view, filename='untitled'):
 		for start, end in results:
 			underlineRange(lineno, start+offset, end-start)
 
-	for line in errors.splitlines():
-		match = re.match(r'(?P<error>.+?) at .+? line (?P<line>\d+)(, near "(?P<near>.+?)")?', line)
+	for line in errors:
+		match = re.match(r'.* line (?P<line>\d+), col (?P<near>.+?)?, (?P<error>.+?)\.', line)
 
 		if match:
 			error, line = match.group('error'), match.group('line')

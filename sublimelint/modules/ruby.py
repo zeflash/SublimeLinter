@@ -52,4 +52,4 @@ def run(code, view, filename='untitled'):
       lines.add(lineno)
       addMessage(lineno, error)
 
-  return underline, lines, errorMessages, True
+  return underline, lines, errorMessages

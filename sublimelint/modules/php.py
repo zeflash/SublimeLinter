@@ -9,8 +9,18 @@ def check(codeString, filename):
 		info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 		info.wShowWindow = subprocess.SW_HIDE
 
-	process = subprocess.Popen(('php', '-l', '-d display_errors=On'), stdin=subprocess.PIPE, stdout=subprocess.PIPE, startupinfo=info)
-	result = process.communicate(codeString)[0]
+	process = subprocess.Popen(('php', '-l', '-d display_errors=On'), 
+								stdin=subprocess.PIPE, 
+								stdout=subprocess.PIPE, 
+								startupinfo=info)
+
+	plainText = codeString.encode("ascii", 'ignore')
+	try:
+		result = process.communicate(plainText)[0]
+	except:
+		return False
+	finally:
+		process.kill
 
 	return result
 
@@ -18,6 +28,11 @@ def check(codeString, filename):
 import re
 __all__ = ['run', 'language']
 language = 'PHP'
+description =\
+'''* view.run_command("lint", "PHP")
+        Turns background linter off and runs the default PHP linter
+        (php - l, assumed to be on $PATH) on current view.
+'''
 
 def run(code, view, filename='untitled'):
 	errors = check(code, filename)
@@ -43,4 +58,4 @@ def run(code, view, filename='untitled'):
 			lines.add(lineno)
 			addMessage(lineno, error)
 
-	return underline, lines, errorMessages, True
+	return underline, lines, errorMessages
