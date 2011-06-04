@@ -16,15 +16,15 @@ import sublime_plugin
 
 from sublimelint.loader import Loader
 
-LINTERS = {} # mapping of language name to linter module
-QUEUE = {}     # views waiting to be processed by linter
-ERRORS = {} # error messages on given line obtained from linter; they are
-            # displayed in the status bar when cursor is on line with error
-VIOLATIONS = {} # violation messages, they are displayed in the status bar
-WARNINGS = {} # warning messages, they are displayed in the status bar
-HELP = []   # collects all "help" (docstring, etc.) information
-MOD_LOAD = Loader(os.getcwd(), LINTERS, HELP) # utility to load (and reload
-            # if necessary) linter modules [useful when working on plugin]
+LINTERS = {}     # mapping of language name to linter module
+QUEUE = {}       # views waiting to be processed by linter
+ERRORS = {}      # error messages on given line obtained from linter; they are
+                 # displayed in the status bar when cursor is on line with error
+VIOLATIONS = {}  # violation messages, they are displayed in the status bar
+WARNINGS = {}    # warning messages, they are displayed in the status bar
+HELP = []        # collects all "help" (docstring, etc.) information
+MOD_LOAD = Loader(os.getcwd(), LINTERS, HELP)  # utility to load (and reload
+                 # if necessary) linter modules [useful when working on plugin]
 
 HELP.insert(0,
 '''SublimeLint help
@@ -149,11 +149,13 @@ options:
 '''
 )
 
+
 def help_collector(fn):
     '''decorator used to automatically extract docstrings and collect them
     for future display'''
     HELP.append(fn.__doc__)
     return fn
+
 
 def background_run(linter, view):
     '''run a linter on a given view if settings is set appropriately'''
@@ -163,16 +165,18 @@ def background_run(linter, view):
     if view.settings().get('sublimelint_notes'):
         highlight_notes(view)
 
+
 def run_(linter, view):
     '''run a linter on a given view regardless of user setting'''
     vid = view.id()
     text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
     if view.file_name():
-        filename = view.file_name() # os.path.split(view.file_name())[-1]
+        filename = view.file_name()  # os.path.split(view.file_name())[-1]
     else:
         filename = 'untitled'
     lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(text, view, filename)
     add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines)
+
 
 def run_once(linter, view):
     '''run a linter on a given view regardless of user setting'''
@@ -180,6 +184,7 @@ def run_once(linter, view):
         highlight_notes(view)
         return
     run_(linter, view)
+
 
 def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines):
     '''Adds lint marks to view.'''
@@ -215,6 +220,7 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
             view.add_regions('lint-outlines', error_outlines,
                 'sublimelint.illegal', sublime.DRAW_OUTLINED)
 
+
 def erase_lint_marks(view):
     '''erase all "lint" error marks from view'''
     view.erase_regions('lint-underline')
@@ -233,6 +239,7 @@ def select_linter(view):
             return LINTERS[language]
     return None
 
+
 def highlight_notes(view):
     '''highlight user-specified annotations in a file'''
     view.erase_regions('annotations')
@@ -242,10 +249,12 @@ def highlight_notes(view):
         view.add_regions('annotations', regions, "sublimelint.annotations",
                                             sublime.DRAW_EMPTY_AS_OVERWRITE)
 
+
 def queue_linter(view):
     '''Put the current view in a queue to be examined by a linter'''
     if select_linter(view) is None:
-        erase_lint_marks(view) # may have changed file type and left marks behind
+        erase_lint_marks(view)  # may have changed file type and left marks behind
+
     # user annotations could be present in all types of files
     def _update_view(view):
         linter = select_linter(view)
@@ -254,6 +263,7 @@ def queue_linter(view):
         except RuntimeError, excp:
             print excp
     queue(view, _update_view, 300, 600)
+
 
 def background_linter():
     __lock_.acquire()
@@ -272,43 +282,77 @@ def background_linter():
 
 queue_dispatcher = background_linter
 queue_thread_name = "background linter"
+MAX_DELAY = 2
+
 
 def queue_loop():
     '''An infinite loop running the linter in a background thread meant to
         update the view after user modifies it and then does no further
         modifications for some time as to not slow down the UI with linting.'''
+    global __signaled_first_
     while __loop_:
         __semaphore_.acquire()
+        __signaled_first_ = 0
         queue_dispatcher()
 
-def queue(view, callback, timeout, busy_timeout=None, args=[], kwargs={}):
-    #TODO: Add smart queues (faster if line changes or last character was not part of a whole word)
-    global __signaled_
+
+def queue(view, callback, timeout, busy_timeout=None, preemptive=False, args=[], kwargs={}):
+    global __signaled_, __signaled_first_
     now = time.time()
     __lock_.acquire()
     try:
         QUEUE[view.id()] = (view, callback, args, kwargs)
         if now < __signaled_ + timeout * 4:
-            next = busy_timeout or timeout
-        else:
-            next = timeout
-        __signaled_ = now + float(next) / 1000 - 0.01
+            timeout = busy_timeout or timeout
+
+        _delay_queue(timeout, True)
+        if not __signaled_first_:
+            __signaled_first_ = __signaled_
+    finally:
+        __lock_.release()
+
+
+def _delay_queue(timeout, preemptive):
+    global __signaled_
+    now = time.time()
+    _timeout = float(timeout) / 1000
+    if __signaled_first_:
+        if now - __signaled_first_ + _timeout > MAX_DELAY:
+            _timeout -= now - __signaled_first_
+            if _timeout < 0:
+                _timeout = 0
+            timeout = int(round(_timeout * 1000, 0))
+    new__signaled_ = now + _timeout - 0.0
+    if not __signaled_ or not __signaled_first_ or __signaled_ >= now - 0.01 and (preemptive or new__signaled_ >= __signaled_ - 0.01):
+        __signaled_ = new__signaled_
+
         def _signal():
             if time.time() < __signaled_:
                 return
             __semaphore_.release()
-        sublime.set_timeout(_signal, next)
+        sublime.set_timeout(_signal, timeout)
+
+
+def delay_queue(timeout):
+    __lock_.acquire()
+    try:
+        _delay_queue(timeout, False)
     finally:
         __lock_.release()
+
 
 # only start the thread once - otherwise the plugin will get laggy
 # when saving it often.
 __semaphore_ = threading.Semaphore(0)
 __lock_ = threading.Lock()
 __signaled_ = 0
+__signaled_first_ = 0
+
 # First finalize old standing threads:
 __loop_ = False
 __pre_initialized_ = False
+
+
 def queue_finalize(timeout=None):
     global __pre_initialized_
     for thread in threading.enumerate():
@@ -331,6 +375,7 @@ UNRECOGNIZED = '''
 ==============================================
 
 '''
+
 
 class Lint(sublime_plugin.TextCommand):
     '''command to interact with linters'''
@@ -430,6 +475,7 @@ class Lint(sublime_plugin.TextCommand):
             self.view.settings().set('sublimelint', None)
         run_once(LINTERS[name], self.view)
 
+
 class Annotations(Lint):
     '''Commands to extract annotations and display them in
        a file
@@ -490,6 +536,8 @@ class BackgroundLinter(sublime_plugin.EventListener):
         queue_linter(view)
 
     def on_selection_modified(self, view):
+        delay_queue(200)  # on movement, delay queue (to make movement responsive)
+
         vid = view.id()
         lineno = view.rowcol(view.sel()[0].end())[0]
         if vid in ERRORS and lineno in ERRORS[vid]:
