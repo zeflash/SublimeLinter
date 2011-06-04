@@ -820,7 +820,7 @@ def run(code, view, filename='untitled'):
                                             not wordmatch or result.group('underline') == wordmatch]
 
         for start, end in results:
-            underlineRange(underlines, lineno, start+offset, end-start)
+            underlineRange(underlines, lineno, start + offset, end - start)
 
     def underlineWord(underlines, lineno, word):
         regex = r'((and|or|not|if|elif|while|in)\s+|[+\-*^%%<>=\(\{])*\s*(?P<underline>[\w\.]*%s[\w]*)' % (word)
@@ -854,6 +854,9 @@ def run(code, view, filename='untitled'):
 
     if view.settings().get("pep8", True):
         def report_error(self, line_number, offset, text, check):
+            code = text[:4]
+            if pep8.ignore_code(code):
+                return
             line_number = line_number - 1
             lines.add(line_number)
             if text.startswith('E'):
@@ -867,15 +870,20 @@ def run(code, view, filename='untitled'):
         class FakeOptions:
             verbose = 0
             select = []
-            ignore = []
-        pep8.options = FakeOptions
+            ignore = view.settings().get('pep8_ignore', []) + pep8.DEFAULT_IGNORE.split(',')
+        pep8.options = FakeOptions()
         pep8.options.physical_checks = pep8.find_checks('physical_line')
         pep8.options.logical_checks = pep8.find_checks('logical_line')
         pep8.options.counters = dict.fromkeys(pep8.BENCHMARK_KEYS, 0)
-        try:
-            pep8.Checker(filename, [l + '\n' for l in _lines]).check_all()
-        except:
-            pass
+        if _lines:
+            good_lines = [l + '\n' for l in _lines]
+            good_lines[-1] = good_lines[-1].rstrip('\n')
+            if not good_lines[-1]:
+                good_lines = good_lines[:-1]
+            try:
+                pep8.Checker(filename, good_lines).check_all()
+            except:
+                pass
 
     stripped_lines = []
     good_lines = []
