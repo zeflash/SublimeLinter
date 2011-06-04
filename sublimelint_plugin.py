@@ -81,7 +81,7 @@ to your theme (adapting the color to your liking):
             <key>settings</key>
             <dict>
                 <key>foreground</key>
-                <string>#ff4A4ABB</string>
+                <string>#ff3A4ACC</string>
             </dict>
         </dict>
         <dict>
@@ -125,7 +125,7 @@ to your theme (adapting the color to your liking):
             <key>settings</key>
             <dict>
                 <key>foreground</key>
-                <string>#4Aff4A33</string>
+                <string>#ffffff33</string>
             </dict>
         </dict>
         <dict>
@@ -136,7 +136,7 @@ to your theme (adapting the color to your liking):
             <key>settings</key>
             <dict>
                 <key>foreground</key>
-                <string>#009900</string>
+                <string>#999999</string>
             </dict>
         </dict>
 
