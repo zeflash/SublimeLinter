@@ -20,6 +20,7 @@ LINTERS = {} # mapping of language name to linter module
 QUEUE = {}     # views waiting to be processed by linter
 ERRORS = {} # error messages on given line obtained from linter; they are
             # displayed in the status bar when cursor is on line with error
+WARNINGS = {} # warning messages, they are displayed in the status bar
 HELP = []   # collects all "help" (docstring, etc.) information
 MOD_LOAD = Loader(os.getcwd(), LINTERS, HELP) # utility to load (and reload
             # if necessary) linter modules [useful when working on plugin]
@@ -43,11 +44,11 @@ on demand.
 When an "error" is highlighted by the linter, putting the cursor on the
 offending line will result in the error message being displayed on the
 status bar.
-	
+
 
 Color: lint "errors"
 --------------------
-	
+
 The color used to outline lint errors is the invalid.illegal scope
 which should normally be defined in your default theme.
 
@@ -68,7 +69,7 @@ to your theme (adapting the color to your liking):
             <key>settings</key>
             <dict>
                 <key>foreground</key>
-                <string>#FFFFAA</string>
+                <string>#FFFFAAE0</string>
             </dict>
         </dict>
         <dict>
@@ -79,7 +80,7 @@ to your theme (adapting the color to your liking):
             <key>settings</key>
             <dict>
                 <key>foreground</key>
-                <string>#ff4A4988</string>
+                <string>#ff4A4ABB</string>
             </dict>
         </dict>
         <dict>
@@ -93,6 +94,28 @@ to your theme (adapting the color to your liking):
                 <string>#FF0000</string>
             </dict>
         </dict>
+        <dict>
+            <key>name</key>
+            <string>Sublimelint Outline</string>
+            <key>scope</key>
+            <string>sublimelint.illegal</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#4Aff4A55</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
+            <string>Sublimelint Underline</string>
+            <key>scope</key>
+            <string>invalid.illegal</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#00BB00</string>
+            </dict>
+        </dict>
 
 ==================================================================
 
@@ -102,13 +125,13 @@ options:
 ------------------------------------------------------------------
 '''
 )
-	
+
 def help_collector(fn):
     '''decorator used to automatically extract docstrings and collect them
     for future display'''
     HELP.append(fn.__doc__)
     return fn
-	
+
 def background_run(linter, view):
     '''run a linter on a given view if settings is set appropriately'''
     if view.settings().get('sublimelint'):
@@ -125,39 +148,47 @@ def run_(linter, view):
         filename = view.file_name() # os.path.split(view.file_name())[-1]
     else:
         filename = 'untitled'
-    underlines, lines, ERRORS[vid] = linter.run(text, view, filename)
-    add_lint_marks(view, underlines, lines)
+    lines, error_underlines, warning_underlines, ERRORS[vid], WARNINGS[vid] = linter.run(text, view, filename)
+    add_lint_marks(view, lines, error_underlines, warning_underlines)
 
 def run_once(linter, view):
     '''run a linter on a given view regardless of user setting'''
     if linter == LINTERS["annotations"]:
         highlight_notes(view)
         return
-    vid = view.id()
-    text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
-    if view.file_name():
-        filename = view.file_name()
-    else:
-        filename = 'untitled'
-    underlines, lines, ERRORS[vid] = linter.run(text, view, filename)
-    add_lint_marks(view, underlines, lines)
-	
-def add_lint_marks(view, underlines, lines):
+    run_(linter, view)
+
+def add_lint_marks(view, lines, error_underlines, warning_underlines):
     '''Adds lint marks to view.'''
+    vid = view.id()
     erase_lint_marks(view)
-		
-    if underlines:
-        view.add_regions('lint-underline', underlines, 'invalid.illegal',
+    if warning_underlines:
+        view.add_regions('lint-underline-warnings', warning_underlines, 'invalid.warning',
+                                            sublime.DRAW_EMPTY_AS_OVERWRITE)
+    if error_underlines:
+        view.add_regions('lint-underline', error_underlines, 'invalid.illegal',
                                             sublime.DRAW_EMPTY_AS_OVERWRITE)
     if lines:
-        outlines = [view.full_line(view.text_point(nb, 0)) for nb in lines]
-        view.add_regions('lint-outlines', outlines, 'sublimelint.illegal',
-                                                    sublime.DRAW_OUTLINED)
-	
+        error_outlines = []
+        warning_outlines = []
+        for line in lines:
+            if line in ERRORS[vid]:
+                error_outlines.append(view.full_line(view.text_point(line, 0)))
+            if line in WARNINGS[vid]:
+                warning_outlines.append(view.full_line(view.text_point(line, 0)))
+        if warning_outlines:
+            view.add_regions('lint-outlines-warnings', warning_outlines, 
+                'sublimelint.warning', sublime.DRAW_OUTLINED)
+        if error_outlines:
+            view.add_regions('lint-outlines', error_outlines, 
+                'sublimelint.illegal', sublime.DRAW_OUTLINED)
+
 def erase_lint_marks(view):
     '''erase all "lint" error marks from view'''
     view.erase_regions('lint-underline')
+    view.erase_regions('lint-underline-warnings')
     view.erase_regions('lint-outlines')
+    view.erase_regions('lint-outlines-warnings')
 
 
 def select_linter(view):
@@ -269,11 +300,11 @@ UNRECOGNIZED = '''
 
 class Lint(sublime_plugin.TextCommand):
     '''command to interact with linters'''
-	
+
     def __init__(self, view):
         self.view = view
         self.help_called = False
-	
+
     def run_(self, name):
         '''method called by default via view.run_command;
            used to dispatch to appropriate method'''
@@ -288,7 +319,7 @@ class Lint(sublime_plugin.TextCommand):
             self.help()
             del HELP[0]
             return
-	
+
         if lc_name == "help":
             self.help()
         elif lc_name == "reset":
@@ -429,5 +460,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
         lineno = view.rowcol(view.sel()[0].end())[0]
         if vid in ERRORS and lineno in ERRORS[vid]:
             view.set_status('Linter', '; '.join(ERRORS[vid][lineno]))
+        elif vid in WARNINGS and lineno in WARNINGS[vid]:
+            view.set_status('Linter', '; '.join(WARNINGS[vid][lineno]))
         else:
             view.erase_status('Linter')

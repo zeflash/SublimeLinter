@@ -65,13 +65,14 @@ def remove_unwanted(errors):
 def run(code, *dummy):
 	'''the common entry point to all linters'''
 	if not PYLINT_AVAILABLE:
-		return [], [], {}
+		return [], [], [], {}, {}
 
 	errors = run_pylint(code)
 	errors = remove_unwanted(errors)
 
 	lines = set()
 	error_messages = {}
+	warning_messages = {}
 	
 	for line in errors.splitlines():
 		info = line.split(":")
@@ -87,4 +88,4 @@ def run(code, *dummy):
 		else:
 			error_messages[lineno] = [message]
 
-	return [], lines, error_messages
+	return lines, [], [], error_messages, warning_messages
