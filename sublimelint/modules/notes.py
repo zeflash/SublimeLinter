@@ -1,6 +1,6 @@
 '''notes.py
 
-Used to highlight user-defined "annotations" such as TODO, README, etc., 
+Used to highlight user-defined "annotations" such as TODO, README, etc.,
 depending user choice.
 
 '''
@@ -17,14 +17,16 @@ description =\
         be assumed: annotations = %s
 ''' % default_notes
 
+
 def run(code, view):
     '''linter method called by default'''
     annotations = select_(view)
-    
+
     regions = []
     for note in annotations:
         regions.extend(find_all(code, note, view))
     return regions
+
 
 def select_(view):
     '''selects the list of annotations to use'''
@@ -33,6 +35,7 @@ def select_(view):
         return default_notes
     else:
         return annotations
+
 
 def extract_annotations(code, view, filename):
     '''extract all lines with annotations'''
@@ -56,11 +59,11 @@ def extract_annotations(code, view, filename):
     text = []
     for region in regions_with_notes:
         row, col = view.rowcol(region.begin())
-        text.append("[[%s:%s]]" % (filename, row+1))
+        text.append("[[%s:%s]]" % (filename, row + 1))
         text.append(view.substr(region))
 
     return '\n'.join(text)
-    
+
 
 def find_all(text, string, view):
     ''' finds all occurences of "string" in "text" and notes their positions
@@ -73,7 +76,7 @@ def find_all(text, string, view):
         start = text.find(string, start)
         if start != -1:
             end = start + length
-            found.append( sublime.Region(start, end) )
+            found.append(sublime.Region(start, end))
             start = end
         else:
             break

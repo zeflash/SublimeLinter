@@ -699,18 +699,23 @@ class Checker(object):
                 importation.used = (self.scope, node.lineno)
             self.addBinding(node.lineno, importation)
 
+
 class OffsetError(messages.Message):
     message = '%r at offset %r'
+
     def __init__(self, filename, lineno, text, offset):
         messages.Message.__init__(self, filename, lineno)
         self.offset = offset
         self.message_args = (text, offset)
 
+
 class PythonError(messages.Message):
     message = '%r'
+
     def __init__(self, filename, lineno, text):
         messages.Message.__init__(self, filename, lineno)
         self.message_args = (text,)
+
 
 def check(codeString, filename):
     codeString = codeString.rstrip()
@@ -764,7 +769,8 @@ def check(codeString, filename):
 # end pyflakes
 # start sublimelint python plugin
 
-import sys, re
+import re
+import sys
 
 language = 'Python'
 description =\
