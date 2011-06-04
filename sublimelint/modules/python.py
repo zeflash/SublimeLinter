@@ -857,10 +857,10 @@ def run(code, view, filename='untitled'):
             line_number = line_number - 1
             lines.add(line_number)
             if text.startswith('E'):
-                addMessage(violationMessages, line_number, text)
+                addMessage(violationMessages, line_number, text[5:])
                 underlineRange(violation_underlines, line_number, offset)
             else:
-                addMessage(warningMessages, line_number, text)
+                addMessage(warningMessages, line_number, text[5:])
                 underlineRange(warning_underlines, line_number, offset)
         pep8.Checker.report_error = report_error
 
@@ -876,7 +876,6 @@ def run(code, view, filename='untitled'):
             pep8.Checker(filename, [l + '\n' for l in _lines]).check_all()
         except:
             pass
-
 
     stripped_lines = []
     good_lines = []
