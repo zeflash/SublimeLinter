@@ -9,7 +9,7 @@ Questions: andre.roberge (at) gmail.com
 '''
 import os
 import time
-import thread
+import threading
 
 import sublime
 import sublime_plugin
@@ -180,37 +180,86 @@ def highlight_notes(view):
 def queue_linter(view):
     '''Put the current view in a queue to be examined by a linter'''
     if select_linter(view) is None:
-        erase_lint_marks(view)#may have changed file type and left marks behind
-    #user annotations could be present in all types of files
-    QUEUE[view.id()] = view
-
+        erase_lint_marks(view) # may have changed file type and left marks behind
+    # user annotations could be present in all types of files
+    def _update_view(view):
+        linter = select_linter(view)
+        try:
+            background_run(linter, view)
+        except RuntimeError, excp:
+            print excp
+    queue(view, _update_view, 300, 600)
 
 def background_linter():
-    '''An infinite loop meant to periodically
-       update the view after running the linter in a background thread
-       so as to not slow down the UI too much.'''
-    while True:
-        time.sleep(0.5)
-        for vid in dict(QUEUE):
-            _view = QUEUE[vid]
-            def _update_view():
-                linter = select_linter(_view)
-                try:
-                    background_run(linter, _view)
-                except RuntimeError, excp:
-                    print excp
-            sublime.set_timeout(_update_view, 100)
-            try:
-                del QUEUE[vid]
-            except:
-                pass
+    __lock_.acquire()
+    try:
+        views = QUEUE.values()
+        QUEUE.clear()
+    finally:
+        __lock_.release()
+    for view, callback, args, kwargs in views:
+        def _callback():
+            callback(view, *args, **kwargs)
+        sublime.set_timeout(_callback, 0)
+
+################################################################################
+# Queue dispatcher system:
+
+queue_dispatcher = background_linter
+queue_thread_name = "background linter"
+
+def queue_loop():
+    '''An infinite loop running the linter in a background thread meant to
+        update the view after user modifies it and then does no further
+        modifications for some time as to not slow down the UI with linting.'''
+    while __loop_:
+        __semaphore_.acquire()
+        queue_dispatcher()
+
+def queue(view, callback, timeout, busy_timeout=None, args=[], kwargs={}):
+    #TODO: Add smart queues (faster if line changes or last character was not part of a whole word)
+    global __signaled_
+    now = time.time()
+    __lock_.acquire()
+    try:
+        QUEUE[view.id()] = (view, callback, args, kwargs)
+        if now < __signaled_ + timeout * 4:
+            next = busy_timeout or timeout
+        else:
+            next = timeout
+        __signaled_ = now + float(next) / 1000 - 0.01
+        def _signal():
+            if time.time() < __signaled_:
+                return
+            __semaphore_.release()
+        sublime.set_timeout(_signal, next)
+    finally:
+        __lock_.release()
 
 # only start the thread once - otherwise the plugin will get laggy
-# when saving it often
-if not '__active_linter_thread' in globals():
-    __active_linter_thread = True
-    thread.start_new_thread(background_linter, ())
+# when saving it often.
+__semaphore_ = threading.Semaphore(0)
+__lock_ = threading.Lock()
+__signaled_ = 0
+# First finalize old standing threads:
+__loop_ = False
+__pre_initialized_ = False
+def queue_finalize(timeout=None):
+    global __pre_initialized_
+    for thread in threading.enumerate():
+        if thread.isAlive() and thread.name == queue_thread_name:
+            __pre_initialized_ = True
+            thread.__semaphore_.release()
+            thread.join(timeout)
+queue_finalize()
 
+# Initialize background thread:
+__loop_ = True
+__active_linter_thread = threading.Thread(target=queue_loop, name=queue_thread_name)
+__active_linter_thread.__semaphore_ = __semaphore_
+__active_linter_thread.start()
+
+################################################################################
 
 UNRECOGNIZED = '''
 * Unrecognized option * :  %s
