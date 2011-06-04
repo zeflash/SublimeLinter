@@ -20,6 +20,7 @@ LINTERS = {} # mapping of language name to linter module
 QUEUE = {}     # views waiting to be processed by linter
 ERRORS = {} # error messages on given line obtained from linter; they are
             # displayed in the status bar when cursor is on line with error
+VIOLATIONS = {} # violation messages, they are displayed in the status bar
 WARNINGS = {} # warning messages, they are displayed in the status bar
 HELP = []   # collects all "help" (docstring, etc.) information
 MOD_LOAD = Loader(os.getcwd(), LINTERS, HELP) # utility to load (and reload
@@ -96,6 +97,28 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
+            <string>Sublimelint Violation Outline</string>
+            <key>scope</key>
+            <string>sublimelint.violation</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#DF9400BB</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
+            <string>Sublimelint Violation Underline</string>
+            <key>scope</key>
+            <string>invalid.violation</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#F99B00</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
             <string>Sublimelint Outline</string>
             <key>scope</key>
             <string>sublimelint.illegal</string>
@@ -148,8 +171,8 @@ def run_(linter, view):
         filename = view.file_name() # os.path.split(view.file_name())[-1]
     else:
         filename = 'untitled'
-    lines, error_underlines, warning_underlines, ERRORS[vid], WARNINGS[vid] = linter.run(text, view, filename)
-    add_lint_marks(view, lines, error_underlines, warning_underlines)
+    lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(text, view, filename)
+    add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines)
 
 def run_once(linter, view):
     '''run a linter on a given view regardless of user setting'''
@@ -158,37 +181,48 @@ def run_once(linter, view):
         return
     run_(linter, view)
 
-def add_lint_marks(view, lines, error_underlines, warning_underlines):
+def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines):
     '''Adds lint marks to view.'''
     vid = view.id()
     erase_lint_marks(view)
     if warning_underlines:
-        view.add_regions('lint-underline-warnings', warning_underlines, 'invalid.warning',
+        view.add_regions('lint-underline-warning', warning_underlines, 'invalid.warning',
+                                            sublime.DRAW_EMPTY_AS_OVERWRITE)
+    if violation_underlines:
+        view.add_regions('lint-underline-violation', violation_underlines, 'invalid.violation',
                                             sublime.DRAW_EMPTY_AS_OVERWRITE)
     if error_underlines:
         view.add_regions('lint-underline', error_underlines, 'invalid.illegal',
                                             sublime.DRAW_EMPTY_AS_OVERWRITE)
     if lines:
-        error_outlines = []
         warning_outlines = []
+        violation_outlines = []
+        error_outlines = []
         for line in lines:
-            if line in ERRORS[vid]:
-                error_outlines.append(view.full_line(view.text_point(line, 0)))
             if line in WARNINGS[vid]:
                 warning_outlines.append(view.full_line(view.text_point(line, 0)))
+            if line in VIOLATIONS[vid]:
+                violation_outlines.append(view.full_line(view.text_point(line, 0)))
+            if line in ERRORS[vid]:
+                error_outlines.append(view.full_line(view.text_point(line, 0)))
         if warning_outlines:
-            view.add_regions('lint-outlines-warnings', warning_outlines, 
+            view.add_regions('lint-outlines-warning', warning_outlines,
                 'sublimelint.warning', sublime.DRAW_OUTLINED)
+        if violation_outlines:
+            view.add_regions('lint-outlines-violation', violation_outlines,
+                'sublimelint.violation', sublime.DRAW_OUTLINED)
         if error_outlines:
-            view.add_regions('lint-outlines', error_outlines, 
+            view.add_regions('lint-outlines', error_outlines,
                 'sublimelint.illegal', sublime.DRAW_OUTLINED)
 
 def erase_lint_marks(view):
     '''erase all "lint" error marks from view'''
     view.erase_regions('lint-underline')
-    view.erase_regions('lint-underline-warnings')
+    view.erase_regions('lint-underline-violation')
+    view.erase_regions('lint-underline-warning')
     view.erase_regions('lint-outlines')
-    view.erase_regions('lint-outlines-warnings')
+    view.erase_regions('lint-outlines-violation')
+    view.erase_regions('lint-outlines-warning')
 
 
 def select_linter(view):
@@ -460,6 +494,8 @@ class BackgroundLinter(sublime_plugin.EventListener):
         lineno = view.rowcol(view.sel()[0].end())[0]
         if vid in ERRORS and lineno in ERRORS[vid]:
             view.set_status('Linter', '; '.join(ERRORS[vid][lineno]))
+        elif vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
+            view.set_status('Linter', '; '.join(VIOLATIONS[vid][lineno]))
         elif vid in WARNINGS and lineno in WARNINGS[vid]:
             view.set_status('Linter', '; '.join(WARNINGS[vid][lineno]))
         else:

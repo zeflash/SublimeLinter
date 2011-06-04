@@ -45,11 +45,7 @@ import __builtin__
 import os.path
 import compiler
 from compiler import ast
-
-try:
-    import pep8
-except ImportError:
-    pep8 = None
+import pep8
 
 class messages:
     class Message(object):
@@ -774,13 +770,16 @@ language = 'Python'
 description =\
 '''* view.run_command("lint", "Python")
         Turns background linter off and runs the default Python linter
-        (pyflakes) on current view.
+        (pyflakes and PEP8) on current view. (PEP8 can be deactivated with
+        "pep8": false" user preference.)
 '''
 
 
 def run(code, view, filename='untitled'):
     lines = set()
+
     error_underlines = []
+    violation_underlines = []
     warning_underlines = []
 
     def underlineRange(underlines, lineno, position, length=1):
@@ -835,7 +834,9 @@ def run(code, view, filename='untitled'):
         underlineRegex(underlines, lineno, regex, word)
 
     errorMessages = {}
+    violationMessages = {}
     warningMessages = {}
+
     def addMessage(messages, lineno, message):
         message = str(message)
         if lineno in messages:
@@ -843,16 +844,15 @@ def run(code, view, filename='untitled'):
         else:
             messages[lineno] = [message]
 
-
     _lines = code.split('\n')
 
-    if pep8:
+    if view.settings().get("pep8", True):
         def report_error(self, line_number, offset, text, check):
             line_number = line_number - 1
             lines.add(line_number)
             if text.startswith('E'):
-                addMessage(errorMessages, line_number, text)
-                underlineRange(error_underlines, line_number, offset)
+                addMessage(violationMessages, line_number, text)
+                underlineRange(violation_underlines, line_number, offset)
             else:
                 addMessage(warningMessages, line_number, text)
                 underlineRange(warning_underlines, line_number, offset)
@@ -867,7 +867,7 @@ def run(code, view, filename='untitled'):
         pep8.options.logical_checks = pep8.find_checks('logical_line')
         pep8.options.counters = dict.fromkeys(pep8.BENCHMARK_KEYS, 0)
         try:
-            pep8.Checker(filename, _lines).check_all()
+            pep8.Checker(filename, [l + '\n' for l in _lines]).check_all()
         except:
             pass
 
@@ -918,4 +918,4 @@ def run(code, view, filename='untitled'):
         else:
             print 'Oops, we missed an error type!'
 
-    return lines, error_underlines, warning_underlines, errorMessages, warningMessages
+    return lines, error_underlines, violation_underlines, warning_underlines, errorMessages, violationMessages, warningMessages

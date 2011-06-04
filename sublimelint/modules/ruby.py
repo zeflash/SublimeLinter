@@ -35,7 +35,6 @@ def run(code, view, filename='untitled'):
   underline = [] # leave this here for compatibility with original plugin
   
   errorMessages = {}
-  warning_messages = {}
   def addMessage(lineno, message):
     message = str(message)
     if lineno in errorMessages:
@@ -53,4 +52,4 @@ def run(code, view, filename='untitled'):
       lines.add(lineno)
       addMessage(lineno, error)
 
-  return lines, underline, [], errorMessages, warning_messages
+  return lines, underline, [], [], errorMessages, {}, {}
