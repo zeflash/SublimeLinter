@@ -64,7 +64,7 @@ description =\
 
 
 class Pep8Error(pyflakes.messages.Message):
-    message = 'PEP 8: %r'
+    message = 'PEP 8: %s'
 
     def __init__(self, filename, loc, text):
         # PEP 8 Errors are downgraded to "warnings"
@@ -73,7 +73,7 @@ class Pep8Error(pyflakes.messages.Message):
 
 
 class Pep8Warning(pyflakes.messages.Message):
-    message = 'PEP 8: %r'
+    message = 'PEP 8: %s'
 
     def __init__(self, filename, loc, text):
         # PEP 8 Warnings are downgraded to "violations"
