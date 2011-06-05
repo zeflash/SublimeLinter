@@ -113,4 +113,4 @@ class UnusedVariable(Message):
 
     def __init__(self, filename, loc, name):
         Message.__init__(self, filename, loc, message_args=(name,))
-        self.names = name
+        self.name = name
