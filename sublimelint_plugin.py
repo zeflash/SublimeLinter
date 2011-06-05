@@ -157,6 +157,19 @@ def help_collector(fn):
     return fn
 
 
+def update_statusbar(view):
+    vid = view.id()
+    lineno = view.rowcol(view.sel()[0].end())[0]
+    if vid in ERRORS and lineno in ERRORS[vid]:
+        view.set_status('Linter', '; '.join(ERRORS[vid][lineno]))
+    elif vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
+        view.set_status('Linter', '; '.join(VIOLATIONS[vid][lineno]))
+    elif vid in WARNINGS and lineno in WARNINGS[vid]:
+        view.set_status('Linter', '; '.join(WARNINGS[vid][lineno]))
+    else:
+        view.erase_status('Linter')
+
+
 def background_run(linter, view):
     '''run a linter on a given view if settings is set appropriately'''
     if view.settings().get('sublimelint'):
@@ -166,8 +179,11 @@ def background_run(linter, view):
         highlight_notes(view)
 
 
-def run_(linter, view):
+def run_once(linter, view):
     '''run a linter on a given view regardless of user setting'''
+    if linter == LINTERS["annotations"]:
+        highlight_notes(view)
+        return
     vid = view.id()
     text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
     if view.file_name():
@@ -176,14 +192,7 @@ def run_(linter, view):
         filename = 'untitled'
     lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(text, view, filename)
     add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines)
-
-
-def run_once(linter, view):
-    '''run a linter on a given view regardless of user setting'''
-    if linter == LINTERS["annotations"]:
-        highlight_notes(view)
-        return
-    run_(linter, view)
+    update_statusbar(view)
 
 
 def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines):
@@ -544,14 +553,4 @@ class BackgroundLinter(sublime_plugin.EventListener):
 
     def on_selection_modified(self, view):
         delay_queue(200)  # on movement, delay queue (to make movement responsive)
-
-        vid = view.id()
-        lineno = view.rowcol(view.sel()[0].end())[0]
-        if vid in ERRORS and lineno in ERRORS[vid]:
-            view.set_status('Linter', '; '.join(ERRORS[vid][lineno]))
-        elif vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
-            view.set_status('Linter', '; '.join(VIOLATIONS[vid][lineno]))
-        elif vid in WARNINGS and lineno in WARNINGS[vid]:
-            view.set_status('Linter', '; '.join(WARNINGS[vid][lineno]))
-        else:
-            view.erase_status('Linter')
+        update_statusbar(view)
