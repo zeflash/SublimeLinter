@@ -97,9 +97,9 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Violation Outline</string>
+            <string>Sublimelint Warning Outline</string>
             <key>scope</key>
-            <string>sublimelint.violation</string>
+            <string>sublimelint.warning</string>
             <key>settings</key>
             <dict>
                 <key>foreground</key>
@@ -108,9 +108,9 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Violation Underline</string>
+            <string>Sublimelint Warning Underline</string>
             <key>scope</key>
-            <string>invalid.violation</string>
+            <string>invalid.warning</string>
             <key>settings</key>
             <dict>
                 <key>foreground</key>
@@ -119,9 +119,9 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Outline</string>
+            <string>Sublimelint Violation Outline</string>
             <key>scope</key>
-            <string>sublimelint.illegal</string>
+            <string>sublimelint.violation</string>
             <key>settings</key>
             <dict>
                 <key>foreground</key>
@@ -130,9 +130,9 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Underline</string>
+            <string>Sublimelint Violation Underline</string>
             <key>scope</key>
-            <string>invalid.illegal</string>
+            <string>invalid.violation</string>
             <key>settings</key>
             <dict>
                 <key>foreground</key>
