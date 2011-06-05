@@ -1,1 +1,7 @@
+.git
+.hg
+.svn
+
 *.pyc
+*.pyo
+
