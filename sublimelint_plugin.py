@@ -271,7 +271,7 @@ def queue_linter(view):
             background_run(linter, view)
         except RuntimeError, excp:
             print excp
-    queue(view, _update_view, 300, 600)
+    queue(view, _update_view, 400, 1000)
 
 
 def background_linter():
@@ -291,7 +291,7 @@ def background_linter():
 
 queue_dispatcher = background_linter
 queue_thread_name = "background linter"
-MAX_DELAY = 2
+MAX_DELAY = 10
 
 
 def queue_loop():
@@ -318,7 +318,7 @@ def queue(view, callback, timeout, busy_timeout=None, preemptive=False, args=[],
             timeout = busy_timeout or timeout
 
         __signaled_ = now
-        _delay_queue(timeout, True)
+        _delay_queue(timeout, preemptive)
         if not __signaled_first_:
             __signaled_first_ = __signaled_
             #print 'first',
@@ -328,11 +328,14 @@ def queue(view, callback, timeout, busy_timeout=None, preemptive=False, args=[],
 
 
 def _delay_queue(timeout, preemptive):
-    global __signaled_
+    global __signaled_, __queued_
     now = time.time()
+    if not preemptive and now <= __queued_ + 0.01:
+        return  # never delay queues too fast (except preemptively)
+    __queued_ = now
     _timeout = float(timeout) / 1000
     if __signaled_first_:
-        if now - __signaled_first_ + _timeout > MAX_DELAY:
+        if MAX_DELAY > 0 and now - __signaled_first_ + _timeout > MAX_DELAY:
             _timeout -= now - __signaled_first_
             if _timeout < 0:
                 _timeout = 0
@@ -340,7 +343,7 @@ def _delay_queue(timeout, preemptive):
     new__signaled_ = now + _timeout - 0.01
     if __signaled_ >= now - 0.01 and (preemptive or new__signaled_ >= __signaled_ - 0.01):
         __signaled_ = new__signaled_
-        #print 'delayed to', (__signaled_ - now)
+        #print 'delayed to', (preemptive, __signaled_ - now)
 
         def _signal():
             if time.time() < __signaled_:
@@ -361,6 +364,7 @@ def delay_queue(timeout):
 # when saving it often.
 __semaphore_ = threading.Semaphore(0)
 __lock_ = threading.Lock()
+__queued_ = 0
 __signaled_ = 0
 __signaled_first_ = 0
 
@@ -552,5 +556,5 @@ class BackgroundLinter(sublime_plugin.EventListener):
         queue_linter(view)
 
     def on_selection_modified(self, view):
-        delay_queue(200)  # on movement, delay queue (to make movement responsive)
+        delay_queue(1000)  # on movement, delay queue (to make movement responsive)
         update_statusbar(view)
