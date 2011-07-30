@@ -179,6 +179,7 @@ def help_collector(fn):
 def update_statusbar(view):
     vid = view.id()
     lineno = view.rowcol(view.sel()[0].end())[0]
+
     if vid in ERRORS and lineno in ERRORS[vid]:
         view.set_status('Linter', '; '.join(ERRORS[vid][lineno]))
     elif vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
@@ -228,12 +229,12 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
         fill_outlines = view.settings().get('sublimelint_fill_outlines', False)
         outlines = {'warning': [], 'violation': [], 'illegal': []}
         for line in lines:
-            if line in WARNINGS[vid]:
-                outlines['warning'].append(view.full_line(view.text_point(line, 0)))
-            if line in VIOLATIONS[vid]:
-                outlines['violation'].append(view.full_line(view.text_point(line, 0)))
             if line in ERRORS[vid]:
                 outlines['illegal'].append(view.full_line(view.text_point(line, 0)))
+            elif line in WARNINGS[vid]:
+                outlines['warning'].append(view.full_line(view.text_point(line, 0)))
+            elif line in VIOLATIONS[vid]:
+                outlines['violation'].append(view.full_line(view.text_point(line, 0)))
         for lint_type in outlines:
             if outlines[lint_type]:
                 args = [
