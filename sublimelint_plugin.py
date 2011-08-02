@@ -575,3 +575,73 @@ class BackgroundLinter(sublime_plugin.EventListener):
     def on_selection_modified(self, view):
         delay_queue(1000)  # on movement, delay queue (to make movement responsive)
         update_statusbar(view)
+
+
+class MoveToLintErrorCommand(sublime_plugin.TextCommand):
+    def run(self, edit, forward=True):
+        regions = self.get_lint_regions()
+
+        if len(regions) == 0:
+            sublime.error_message('No lint errors.')
+            return
+
+        selected = self.view.sel()
+        point = selected[0].begin() if forward else selected[-1].end()
+        regionToSelect = None
+
+        # If going forward, find the first region beginning after the point.
+        # If going backward, find the first region ending before the point.
+        # If nothing is found in the given direction, wrap to the first/last region.
+        if forward:
+            regions.sort(key=lambda x: x.a)
+
+            for index, region in enumerate(regions):
+                if point < region.begin():
+                    regionToSelect = region
+                    break
+        else:
+            regions.sort(key=lambda x: x.a, reverse=True)
+
+            for index, region in enumerate(regions):
+                if point > region.end():
+                    regionToSelect = region
+                    break
+
+        # If there is only one error line and the cursor is in that line, we cannot move.
+        # Otherwise wrap to the first/last error line unless settings disallow that.
+        if regionToSelect is None and (len(regions) > 1 or not regions[0].contains(point)):
+            if self.view.settings().get('sublimelint_wrap_find', True):
+                regionToSelect = regions[0]
+
+        if regionToSelect is not None:
+            selected.clear()
+
+            # Find the first underline region within the region to select.
+            # If there are none, put the cursor at the beginning of the line.
+            underlineRegion = self.find_underline_within(regionToSelect)
+
+            if underlineRegion is None:
+                underlineRegion = sublime.Region(regionToSelect.begin(), regionToSelect.begin())
+
+            selected.add(underlineRegion)
+            self.view.show(underlineRegion, True)
+        else:
+            sublime.error_message('No {0} lint errors.'.format('next' if forward else 'previous'))
+
+    def get_lint_regions(self):
+        regions = self.view.get_regions('lint-outlines-illegal')
+        regions.extend(self.view.get_regions('lint-outlines-violation'))
+        regions.extend(self.view.get_regions('lint-outlines-warning'))
+        return regions
+
+    def find_underline_within(self, region):
+        underlines = self.view.get_regions('lint-underline-illegal')
+        underlines.extend(self.view.get_regions('lint-underline-violation'))
+        underlines.extend(self.view.get_regions('lint-underline-warning'))
+        underlines.sort(key=lambda x: x.a)
+
+        for underline in underlines:
+            if region.contains(underline):
+                return underline
+
+        return None
