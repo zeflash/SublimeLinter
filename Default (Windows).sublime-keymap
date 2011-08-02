@@ -1,0 +1,4 @@
+[
+    { "keys": ["ctrl+alt+e"], "command": "move_to_lint_error", "args": { "forward": true } },
+    { "keys": ["ctrl+alt+shift+e"], "command": "move_to_lint_error", "args": { "forward": false } }
+]
