@@ -37,7 +37,7 @@ can be quickly located.
 
 To enable a background linter to run by default
 (provided one exists for the language/syntax the file being viewed), set
-the user preference "sublimelint" to true.   If you find that this slows
+the user preference "sublimelint" to true. If you find that this slows
 down the UI too much, you can unset this user preference (or set it to
 false) and use the special commands (described below) to run it only
 on demand.
@@ -46,10 +46,22 @@ When an "error" is highlighted by the linter, putting the cursor on the
 offending line will result in the error message being displayed on the
 status bar.
 
+You can quickly move to the next/previous lint error with the following
+key equivalents:
+
+OS X
+next: ctrl+super+e
+prev: ctrl+super+shift+e
+
+Linux, Windows
+next: ctrl+alt+e
+prev: ctrl+alt+shift+e
+
+By default the search will wrap. You can turn wrapping off by setting
+the setting "sublimelint_wrap_find" to false.
 
 Color: lint "errors"
 --------------------
-
 There are three types of "errors" flagged by sublime lint: illegal,
 violation, and warning. For each type, SublimeLint will indicate the offending
 line and the character position at which the error occurred on the line.
@@ -577,8 +589,12 @@ class BackgroundLinter(sublime_plugin.EventListener):
         update_statusbar(view)
 
 
-class MoveToLintErrorCommand(sublime_plugin.TextCommand):
-    def run(self, edit, forward=True):
+class FindLintErrorCommand(sublime_plugin.TextCommand):
+    # This command is just a superclass for other commands, it is never enabled
+    def is_enabled(self):
+        return False
+
+    def find_lint_error(self, forward):
         regions = self.get_lint_regions()
 
         if len(regions) == 0:
@@ -645,3 +661,33 @@ class MoveToLintErrorCommand(sublime_plugin.TextCommand):
                 return underline
 
         return None
+
+
+class FindNextLintErrorCommand(FindLintErrorCommand):
+    @help_collector
+    def run(self, edit):
+        '''* view.run_command("find_next_lint_error")
+        Move the cursor to the next lint error in the current view.
+        The search will wrap to the top unless the sublimelint_wrap_find
+        setting is set to false.
+        '''
+        self.find_lint_error(forward=True)
+
+    # The superclass is disabled, be sure to enable this
+    def is_enabled(self):
+        return True
+
+
+class FindPreviousLintErrorCommand(FindLintErrorCommand):
+    @help_collector
+    def run(self, edit):
+        '''* view.run_command("find_previous_lint_error")
+        Move the cursor to the previous lint error in the current view.
+        The search will wrap to the bottom unless the sublimelint_wrap_find
+        setting is set to false.
+        '''
+        self.find_lint_error(forward=False)
+
+    # The superclass is disabled, be sure to enable this
+    def is_enabled(self):
+        return True
