@@ -207,7 +207,7 @@ def update_statusbar(view):
 
 def background_run(linter, view):
     '''run a linter on a given view if settings is set appropriately'''
-    if view.settings().get('sublimelint'):
+    if view.settings().get('sublimelint', True):
         if linter:
             run_once(linter, view)
     if view.settings().get('sublimelint_notes'):
