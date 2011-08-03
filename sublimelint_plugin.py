@@ -302,6 +302,10 @@ def queue_linter(view):
     if select_linter(view) is None:
         erase_lint_marks(view)  # may have changed file type and left marks behind
 
+        # No point in queuing anything if no linters will run
+        if not view.settings().get('sublimelint_notes'):
+            return
+
     # user annotations could be present in all types of files
     def _update_view(view):
         linter = select_linter(view)
@@ -309,6 +313,7 @@ def queue_linter(view):
             background_run(linter, view)
         except RuntimeError, excp:
             print excp
+
     queue(view, _update_view, 400, 1000)
 
 
@@ -516,14 +521,14 @@ class Lint(sublime_plugin.TextCommand):
     @help_collector
     def on(self):
         '''* view.run_command("lint", "on")
-        Turns background linter on.
+        Turns background linting on.
         '''
         self.view.settings().set('sublimelint', True)
 
     @help_collector
     def off(self):
         '''* view.run_command("lint", "off")
-        Turns background linter off.
+        Turns background linting off.
         '''
         self.view.settings().set('sublimelint', False)
 
@@ -572,9 +577,8 @@ class Annotations(Lint):
 
 class BackgroundLinter(sublime_plugin.EventListener):
     '''This plugin controls a linter meant to work in the background
-    and to provide information as a file is edited.
-    For all practical purpose, it is possible to turn it off
-    via a user-defined settings.
+    to provide interactive feedback as a file is edited. It can be
+    turned off via a setting.
     '''
     def on_modified(self, view):
         queue_linter(view)
