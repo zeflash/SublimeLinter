@@ -194,9 +194,13 @@ def help_collector(fn):
     return fn
 
 
+def last_selected_lineno(view):
+    return view.rowcol(view.sel()[0].end())[0]
+
+
 def update_statusbar(view):
     vid = view.id()
-    lineno = view.rowcol(view.sel()[0].end())[0]
+    lineno = last_selected_lineno(view)
 
     if vid in ERRORS and lineno in ERRORS[vid]:
         view.set_status('Linter', '; '.join(ERRORS[vid][lineno]))
@@ -281,9 +285,10 @@ def select_linter(view):
     '''selects the appropriate linter to use based on language in
        current view'''
     disable = view.settings().get('sublimelint_disable')
+    syntax = view.settings().get("syntax")
 
     for language in LINTERS:
-        if language in view.settings().get("syntax") and language not in disable:
+        if language in syntax and language not in disable:
             return LINTERS[language]
     return None
 
@@ -580,14 +585,17 @@ class BackgroundLinter(sublime_plugin.EventListener):
     to provide interactive feedback as a file is edited. It can be
     turned off via a setting.
     '''
+
+    def __init__(self):
+        super(BackgroundLinter, self).__init__()
+        self.lastSelectedLineNo = -1
+
     def on_modified(self, view):
         queue_linter(view)
         return
 
     def on_load(self, view):
-        linter = select_linter(view)
-        if linter:
-            background_run(linter, view)
+        background_run(select_linter(view), view)
 
     def on_post_save(self, view):
         for name, module in LINTERS.items():
@@ -598,12 +606,17 @@ class BackgroundLinter(sublime_plugin.EventListener):
         queue_linter(view)
 
     def on_selection_modified(self, view):
-        delay_queue(1000)  # on movement, delay queue (to make movement responsive)
-        update_statusbar(view)
+        # We only display errors in the status bar for the last line in the current selection.
+        # If that line number has not changed, there is no point in updating the status bar.
+        lastSelectedLineNo = last_selected_lineno(view)
+
+        if lastSelectedLineNo != self.lastSelectedLineNo:
+            self.lastSelectedLineNo = lastSelectedLineNo
+            update_statusbar(view)
 
 
 class FindLintErrorCommand(sublime_plugin.TextCommand):
-    # This command is just a superclass for other commands, it is never enabled
+    '''This command is just a superclass for other commands, it is never enabled.'''
     def is_enabled(self):
         return False
 
