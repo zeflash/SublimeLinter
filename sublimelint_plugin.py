@@ -606,6 +606,8 @@ class BackgroundLinter(sublime_plugin.EventListener):
         queue_linter(view)
 
     def on_selection_modified(self, view):
+        delay_queue(1000)  # on movement, delay queue (to make movement responsive)
+
         # We only display errors in the status bar for the last line in the current selection.
         # If that line number has not changed, there is no point in updating the status bar.
         lastSelectedLineNo = last_selected_lineno(view)
