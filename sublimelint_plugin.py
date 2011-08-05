@@ -284,8 +284,8 @@ def erase_lint_marks(view):
 def select_linter(view):
     '''selects the appropriate linter to use based on language in
        current view'''
-    disable = view.settings().get('sublimelint_disable')
-    syntax = view.settings().get("syntax")
+    disable = view.settings().get('sublimelint_disable', [])
+    syntax = view.settings().get('syntax')
 
     for language in LINTERS:
         if language in syntax and language not in disable:
