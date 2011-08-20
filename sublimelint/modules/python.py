@@ -93,7 +93,7 @@ class OffsetError(pyflakes.messages.Message):
 class PythonError(pyflakes.messages.Message):
     message = '%r'
 
-    def __init__(self, filename, loc, text, code):
+    def __init__(self, filename, loc, text):
         pyflakes.messages.Message.__init__(self, filename, loc, level='E', message_args=(text,))
         self.text = text
 
