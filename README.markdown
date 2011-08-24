@@ -1,5 +1,5 @@
-SublimeLint
-=========
+SublimeLinter
+=============
 
 A code-validating plugin with inline highlighting for the [Sublime Text 2](http://sublimetext.com "Sublime Text 2") editor.
 
@@ -14,11 +14,11 @@ Supports the following languages:
 Installing
 -----
 
-*Without Git:* Download the latest source from http://github.com/aroberge/sublimelint and copy sublimelint_plugin.py and the sublimelint/ folder to your Sublime Text "User" packages directory.
+*Without Git:* Download the latest source from http://github.com/Kronuz/SublimeLinter and copy sublimelinter_plugin.py and the SublimeLinter/ folder to your Sublime Text "User" packages directory.
 
 *With Git:* Clone the repository in your Sublime Text Packages directory (located one folder above the "User" directory)
 
-> git clone git://github.com/lunixbochs/sublimelint.git
+> git clone git://github.com/Kronuz/SublimeLinter.git
 
 
 The "User" packages directory is located at:
@@ -39,7 +39,7 @@ For detailed, up to date instructions, enter the following at the console
 or
     view.run_command("lint", "help")
 
-1. To enable the plugin to work by default, you need to set a user preference "sublimelint" to true.
+1. To enable the plugin to work by default, you need to set a user preference "sublimelinter" to true.
 2. You can turn on/off the linter via a command view.run_command("linter_on") (or "linter_off") - even if you have not set a user preference before.
 
 Note that the linter normally works in a background thread and is constantly refreshing when enabled.
@@ -52,10 +52,10 @@ view.run_command("reset_linter").
 Disabling Languages
 -------------------
 
-If you want to disable linting for specific languages, add their names to the file settings array "sublimelint_disable".
+If you want to disable linting for specific languages, add their names to the file settings array "sublimelinter_disable".
 For example, to disable Perl linting:
 
-    "sublimelint_disable":
+    "sublimelinter_disable":
         [
             "Perl"
         ],
@@ -63,7 +63,7 @@ For example, to disable Perl linting:
 Python and PEP8
 ---------------
 
-If you use SublimeLint for pep8 checks, you can ignore some of the conventions,
+If you use SublimeLinter for pep8 checks, you can ignore some of the conventions,
 with the user preference "pep8_ignore".
 
 Here is an example:
@@ -79,7 +79,7 @@ of codes (as "E501") in [this file](https://github.com/jcrocholl/pep8/blob/maste
 Python and PyFlakes
 -------------------
 
-If you use SublimeLint for pyflakes checks, you can ignore some of the "undefined name xxx" errors (comes in handy if you work with post-processors, globals/builtins available only at runtime, etc.). You can control what names will be ignored with the user preference "pyflakes_ignore".
+If you use SublimeLinter for pyflakes checks, you can ignore some of the "undefined name xxx" errors (comes in handy if you work with post-processors, globals/builtins available only at runtime, etc.). You can control what names will be ignored with the user preference "pyflakes_ignore".
 
 Example:
 

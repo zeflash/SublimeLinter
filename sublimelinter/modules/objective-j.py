@@ -2,7 +2,7 @@
 # objective-j.py - Lint checking for Objective-J - given filename and contents of the code:
 # It provides a list of line numbers to outline and offsets to highlight.
 #
-# This specific module is part of the SublimeLint project.
+# This specific module is part of the SublimeLinter project.
 # It is a fork by Aparajita Fishman from the Kronuz fork of the original SublimeLint project,
 # (c) 2011 Ryan Hileman and licensed under the MIT license.
 # URL: http://bochs.info/

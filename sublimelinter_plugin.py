@@ -1,7 +1,7 @@
 '''This plugin controls a linter meant to work in the background
 and to provide information as a file is edited.
 
-It requires that the user setting "sublimelint" be set to true
+It requires that the user setting "sublimelinter" be set to true
 to be activated - or, alternatively, that the user runs the command
 view.run_command("lint", "on")
 
@@ -14,7 +14,7 @@ import threading
 import sublime
 import sublime_plugin
 
-from sublimelint.loader import Loader
+from sublimelinter.loader import Loader
 
 LINTERS = {}     # mapping of language name to linter module
 QUEUE = {}       # views waiting to be processed by linter
@@ -27,23 +27,23 @@ MOD_LOAD = Loader(os.getcwd(), LINTERS, HELP)  # utility to load (and reload
                  # if necessary) linter modules [useful when working on plugin]
 
 HELP.insert(0,
-'''SublimeLint help
-=================
+'''SublimeLinter help
+==================
 
-SublimeLint is a plugin intended to support "lint" programs, highlighting
+SublimeLinter is a plugin intended to support "lint" programs, highlighting
 lines of code which are deemed to contain (potential) errors. It also
 supports highlighting special annotations (for example: TODO) so that they
 can be quickly located.
 
 To enable a background linter to run by default
 (provided one exists for the language/syntax the file being viewed), set
-the user preference "sublimelint" to true. If you find that this slows
+the user preference "sublimelinter" to true. If you find that this slows
 down the UI too much, you can unset this user preference (or set it to
 false) and use the special commands (described below) to run it only
 on demand.
 
 You can disable linting specific languages by adding their names to the settings
-array "sublimelint_disable".
+array "sublimelinter_disable".
 
 When an "error" is highlighted by the linter, putting the cursor on the
 offending line will result in the error message being displayed on the
@@ -61,41 +61,41 @@ next: ctrl+alt+e
 prev: ctrl+alt+shift+e
 
 By default the search will wrap. You can turn wrapping off by setting
-the setting "sublimelint_wrap_find" to false.
+the setting "sublimelinter_wrap_find" to false.
 
 Color: lint "errors"
 --------------------
 There are three types of "errors" flagged by sublime lint: illegal,
-violation, and warning. For each type, SublimeLint will indicate the offending
+violation, and warning. For each type, SublimeLinter will indicate the offending
 line and the character position at which the error occurred on the line.
 
-By default SublimeLint will outline offending lines using the background color
-of the "sublimelint.<type>" theme style, and underline the character position
+By default SublimeLinter will outline offending lines using the background color
+of the "sublimelinter.<type>" theme style, and underline the character position
 using the background color of the "invalid.<type>" theme style, where <type>
 is one of the three error types.
 
 If these styles are not defined, the color will be black when there is a light
 background color and black when there is a dark background color. You may
-define a single "sublimelint" or "invalid" style to color all three types,
+define a single "sublimelinter" or "invalid" style to color all three types,
 or define separate substyles for one or more types to color them differently.
 Most themes have an "invalid" theme style defined by default.
 
 If you want to make the offending lines glaringly obvious (perhaps for those
-who tend to ignore lint errors), you can set the user setting "sublimelint_fill_outlines"
+who tend to ignore lint errors), you can set the user setting "sublimelinter_fill_outlines"
 to true, in which case lines that have errors will be colored with the background
 and foreground color of the "sublime.<type>" theme style. Unless you have defined
 those styles, this setting should be left false.
 
 You may also mark lines with errors by putting an "x" in the gutter by setting
-the "sublimelint_gutter_marks" setting to true.
+the "sublimelinter_gutter_marks" setting to true.
 
 To customize the colors used for highlighting errors and user notes, add the following
 to your theme (adapting the color to your liking):
         <dict>
             <key>name</key>
-            <string>Sublimelint Annotations</string>
+            <string>SublimeLinter Annotations</string>
             <key>scope</key>
-            <string>sublimelint.notes</string>
+            <string>sublimelinter.notes</string>
             <key>settings</key>
             <dict>
                 <key>background</key>
@@ -106,9 +106,9 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Outline</string>
+            <string>SublimeLinter Outline</string>
             <key>scope</key>
-            <string>sublimelint.illegal</string>
+            <string>sublimelinter.illegal</string>
             <key>settings</key>
             <dict>
                 <key>background</key>
@@ -119,7 +119,7 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Underline</string>
+            <string>SublimeLinter Underline</string>
             <key>scope</key>
             <string>invalid.illegal</string>
             <key>settings</key>
@@ -130,9 +130,9 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Warning Outline</string>
+            <string>SublimeLinter Warning Outline</string>
             <key>scope</key>
-            <string>sublimelint.warning</string>
+            <string>sublimelinter.warning</string>
             <key>settings</key>
             <dict>
                 <key>background</key>
@@ -143,7 +143,7 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Warning Underline</string>
+            <string>SublimeLinter Warning Underline</string>
             <key>scope</key>
             <string>invalid.warning</string>
             <key>settings</key>
@@ -154,9 +154,9 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Violation Outline</string>
+            <string>SublimeLinter Violation Outline</string>
             <key>scope</key>
-            <string>sublimelint.violation</string>
+            <string>sublimelinter.violation</string>
             <key>settings</key>
             <dict>
                 <key>background</key>
@@ -167,7 +167,7 @@ to your theme (adapting the color to your liking):
         </dict>
         <dict>
             <key>name</key>
-            <string>Sublimelint Violation Underline</string>
+            <string>SublimeLinter Violation Underline</string>
             <key>scope</key>
             <string>invalid.violation</string>
             <key>settings</key>
@@ -214,10 +214,10 @@ def update_statusbar(view):
 
 def background_run(linter, view):
     '''run a linter on a given view if settings is set appropriately'''
-    if view.settings().get('sublimelint', True):
+    if view.settings().get('sublimelinter', True):
         if linter:
             run_once(linter, view)
-    if view.settings().get('sublimelint_notes'):
+    if view.settings().get('sublimelinter_notes'):
         highlight_notes(view)
 
 
@@ -248,8 +248,8 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
     if error_underlines:
         view.add_regions('lint-underline-illegal', error_underlines, 'invalid.illegal', sublime.DRAW_EMPTY_AS_OVERWRITE)
     if lines:
-        fill_outlines = view.settings().get('sublimelint_fill_outlines', False)
-        gutter_mark = 'cross' if view.settings().get('sublimelint_gutter_marks', False) else ''
+        fill_outlines = view.settings().get('sublimelinter_fill_outlines', False)
+        gutter_mark = 'cross' if view.settings().get('sublimelinter_gutter_marks', False) else ''
         outlines = {'warning': [], 'violation': [], 'illegal': []}
         for line in lines:
             if line in ERRORS[vid]:
@@ -263,7 +263,7 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
                 args = [
                     'lint-outlines-{0}'.format(lint_type),
                     outlines[lint_type],
-                    'sublimelint.{0}'.format(lint_type),
+                    'sublimelinter.{0}'.format(lint_type),
                     gutter_mark
                 ]
                 if not fill_outlines:
@@ -284,7 +284,7 @@ def erase_lint_marks(view):
 def select_linter(view):
     '''selects the appropriate linter to use based on language in
        current view'''
-    disable = view.settings().get('sublimelint_disable', [])
+    disable = view.settings().get('sublimelinter_disable', [])
     syntax = view.settings().get('syntax')
 
     for language in LINTERS:
@@ -299,7 +299,7 @@ def highlight_notes(view):
     text = view.substr(sublime.Region(0, view.size()))
     regions = LINTERS["annotations"].run(text, view)
     if regions:
-        view.add_regions('lint-annotations', regions, "sublimelint.annotations", sublime.DRAW_EMPTY_AS_OVERWRITE)
+        view.add_regions('lint-annotations', regions, "sublimelinter.annotations", sublime.DRAW_EMPTY_AS_OVERWRITE)
 
 
 def queue_linter(view):
@@ -308,7 +308,7 @@ def queue_linter(view):
         erase_lint_marks(view)  # may have changed file type and left marks behind
 
         # No point in queuing anything if no linters will run
-        if not view.settings().get('sublimelint_notes'):
+        if not view.settings().get('sublimelinter_notes'):
             return
 
     # user annotations could be present in all types of files
@@ -520,27 +520,27 @@ class Lint(sublime_plugin.TextCommand):
         so that the relevant "background" linter can run.
         '''
         erase_lint_marks(self.view)
-        if self.view.settings().get('sublimelint') is None:
-            self.view.settings().set('sublimelint', True)
+        if self.view.settings().get('sublimelinter') is None:
+            self.view.settings().set('sublimelinter', True)
 
     @help_collector
     def on(self):
         '''* view.run_command("lint", "on")
         Turns background linting on.
         '''
-        self.view.settings().set('sublimelint', True)
+        self.view.settings().set('sublimelinter', True)
 
     @help_collector
     def off(self):
         '''* view.run_command("lint", "off")
         Turns background linting off.
         '''
-        self.view.settings().set('sublimelint', False)
+        self.view.settings().set('sublimelinter', False)
 
     def _run(self, name):
         '''runs an existing linter'''
-        if self.view.settings().get('sublimelint'):
-            self.view.settings().set('sublimelint', None)
+        if self.view.settings().get('sublimelinter'):
+            self.view.settings().set('sublimelinter', None)
         run_once(LINTERS[name], self.view)
 
 
@@ -600,7 +600,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
     def on_post_save(self, view):
         for name, module in LINTERS.items():
             if module.__file__ == view.file_name():
-                print 'SublimeLint - Reloading language:', module.language
+                print 'SublimeLinter - Reloading language:', module.language
                 MOD_LOAD.reload_module(module)
                 break
         queue_linter(view)
@@ -654,7 +654,7 @@ class FindLintErrorCommand(sublime_plugin.TextCommand):
         # If there is only one error line and the cursor is in that line, we cannot move.
         # Otherwise wrap to the first/last error line unless settings disallow that.
         if regionToSelect is None and (len(regions) > 1 or not regions[0].contains(point)):
-            if self.view.settings().get('sublimelint_wrap_find', True):
+            if self.view.settings().get('sublimelinter_wrap_find', True):
                 regionToSelect = regions[0]
 
         if regionToSelect is not None:
@@ -696,7 +696,7 @@ class FindNextLintErrorCommand(FindLintErrorCommand):
     def run(self, edit):
         '''* view.run_command("find_next_lint_error")
         Move the cursor to the next lint error in the current view.
-        The search will wrap to the top unless the sublimelint_wrap_find
+        The search will wrap to the top unless the sublimelinter_wrap_find
         setting is set to false.
         '''
         self.find_lint_error(forward=True)
@@ -711,7 +711,7 @@ class FindPreviousLintErrorCommand(FindLintErrorCommand):
     def run(self, edit):
         '''* view.run_command("find_previous_lint_error")
         Move the cursor to the previous lint error in the current view.
-        The search will wrap to the bottom unless the sublimelint_wrap_find
+        The search will wrap to the bottom unless the sublimelinter_wrap_find
         setting is set to false.
         '''
         self.find_lint_error(forward=False)
