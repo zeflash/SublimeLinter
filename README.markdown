@@ -9,7 +9,8 @@ Supports the following languages:
 * PHP - syntax checking via "php -l"
 * Perl - syntax+deprecation checking via "perl -c"
 * Ruby - syntax checking via "ruby -wc"
-* Objective-J - lint via built-in capp_lint
+* Javascript - lint via jshint (http://jshint.com)
+* Objective-J - lint via built-in capp_lint (https://github.com/aparajita/capp_lint)
 
 Installing
 -----
@@ -52,13 +53,15 @@ view.run_command("reset_linter").
 Disabling Languages
 -------------------
 
-If you want to disable linting for specific languages, add their names to the file settings array "sublimelinter_disable".
+If you want to disable linting for specific languages, add their names (as listed above) to the file settings array "sublimelinter_disable".
 For example, to disable Perl linting:
 
     "sublimelinter_disable":
         [
             "Perl"
         ],
+
+The language name is case-insensitive.
 
 Python and PEP8
 ---------------
