@@ -11,7 +11,6 @@ try:
     from pylint import lint
     PYLINT_AVAILABLE = True
 except ImportError:
-    print "pylint is not available"
     PYLINT_AVAILABLE = False
 
 language = 'pylint'
@@ -19,6 +18,10 @@ description =\
 '''* view.run_command("lint", "pylint")
         Turns background linter off and runs pylint on current view.
 '''
+
+
+def is_enabled():
+    return (PYLINT_AVAILABLE, '' if PYLINT_AVAILABLE else 'the pylint module could not be imported')
 
 
 def run_pylint(code):

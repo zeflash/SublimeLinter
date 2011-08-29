@@ -14,22 +14,42 @@ class Loader(object):
         self.basepath = 'sublimelinter/modules'
         self.linters = linters
         self.modpath = self.basepath.replace('/', '.')
-        self.ignore = '__init__',   # <- tuple!
+        self.ignored = ('__init__', 'utils')
         self.descriptions = descriptions
+        self.fix_path()
         self.load_all()
+
+    def fix_path(self):
+        if os.name != 'posix':
+            return
+
+        path = os.environ['PATH']
+
+        if path:
+            dirs = path.split(':')
+
+            if '/usr/local/bin' not in dirs:
+                dirs.insert(0, '/usr/local/bin')
+
+            if '~/bin' not in dirs and '$HOME/bin' not in dirs:
+                dirs.append('$HOME/bin')
+
+            os.environ['PATH'] = ':'.join(dirs)
 
     def load_all(self):
         '''loads all existing linter modules'''
-        for modf in glob.glob('%s/*.py' % self.basepath):
+        for modf in glob.glob('{0}/*.py'.format(self.basepath)):
             base, name = os.path.split(modf)
             name = name.split('.', 1)[0]
-            if name in self.ignore:
+
+            if name in self.ignored:
                 continue
+
             self.load_module(name)
 
     def load_module(self, name):
         '''loads a single linter module'''
-        fullmod = '%s.%s' % (self.modpath, name)
+        fullmod = '{0}.{1}'.format(self.modpath, name)
 
         # make sure the path didn't change on us (this is needed for submodule reload)
         pushd = os.getcwd()
@@ -50,25 +70,34 @@ class Loader(object):
         # if saved with sublime text
         mod.__file__ = os.path.abspath(mod.__file__).rstrip('co')
 
-        no_error = True
+        is_enabled = True
+
         try:
             language = mod.language
-            self.linters[language] = mod
-            print 'SublimeLinter: Successfully loaded linter %s' % name
-        except AttributeError:
-            print 'SublimeLinter: Loaded %s - no language specified' % name
-            no_error = False
-        except:
-            print 'SublimeLinter: General error importing %s' % name
-            no_error = False
+            is_enabled, reason = mod.is_enabled()
 
-        if no_error:
+            if is_enabled:
+                print 'SublimeLinter: {0} enabled'.format(language)
+                self.linters[language] = mod
+            else:
+                print 'SublimeLinter: {0} disabled ({1})'.format(language, reason)
+
+                if language in self.linters:
+                    del self.linters[language]
+        except AttributeError:
+            print 'SublimeLinter: loaded {0} - no language specified'.format(name)
+            is_enabled = False
+        except:
+            print 'SublimeLinter: general error importing {0} ({1})'.format(name, language)
+            is_enabled = False
+
+        if is_enabled:
             try:
                 self.descriptions.append(mod.description)
             except AttributeError:
-                print 'SublimeLinter: no description present for %s' % name
+                print 'SublimeLinter: no description present for {0}'.format(language)
             except:
-                print 'SublimeLinter: error seeking description of %s' % name
+                print 'SublimeLinter: error seeking description of {0}'.format(language)
 
         os.chdir(pushd)
 

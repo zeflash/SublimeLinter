@@ -18,6 +18,10 @@ description =\
 ''' % default_notes
 
 
+def is_enabled():
+    return (True, '')
+
+
 def run(code, view):
     '''linter method called by default'''
     annotations = select_(view)

@@ -63,6 +63,10 @@ description =\
 '''
 
 
+def is_enabled():
+    return (True, '')
+
+
 class Pep8Error(pyflakes.messages.Message):
     message = 'PEP 8 (%s): %s'
 

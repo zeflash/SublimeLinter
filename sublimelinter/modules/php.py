@@ -1,27 +1,30 @@
 # php.py - sublimelint package for checking php files
 
-import os
 import subprocess
 
+from utils import get_startupinfo
 
-def check(codeString, filename):
-    info = None
-    if os.name == 'nt':
-        info = subprocess.STARTUPINFO()
-        info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        info.wShowWindow = subprocess.SW_HIDE
 
+def is_enabled():
+    try:
+        subprocess.Popen(('php', '-v'),
+                         startupinfo=get_startupinfo())
+    except OSError as (errno, message):
+        return (False, message)
+
+    return (True, '')
+
+
+def check(codeString, args=[]):
     process = subprocess.Popen(('php', '-l', '-d display_errors=On'),
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
-                                startupinfo=info)
+                                startupinfo=get_startupinfo())
 
     try:
         result = process.communicate(codeString)[0]
     except:
-        return False
-    finally:
-        process.kill
+        result = ''
 
     return result
 
@@ -37,7 +40,7 @@ description =\
 
 
 def run(code, view, filename='untitled'):
-    errors = check(code, filename)
+    errors = check(code)
 
     lines = set()
     underline = []  # leave this here for compatibility with original plugin

@@ -54,8 +54,8 @@ description =\
 '''
 
 
-def check(codeString, filename):
-    return None
+def is_enabled():
+    return (True, '')
 
 
 def run(code, view, filename='untitled'):

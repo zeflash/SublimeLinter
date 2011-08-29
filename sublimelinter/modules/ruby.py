@@ -1,21 +1,25 @@
 # ruby.py - sublimelint package for checking ruby files
 
-import os
 import subprocess
+
+from utils import get_startupinfo
+
+
+def is_enabled():
+    try:
+        subprocess.Popen(('ruby', '-v'), startupinfo=get_startupinfo())
+    except OSError as (errno, message):
+        return (False, message)
+
+    return (True, '')
 
 
 def check(codeString, filename):
-    info = None
-    if os.name == 'nt':
-        info = subprocess.STARTUPINFO()
-        info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        info.wShowWindow = subprocess.SW_HIDE
-
     process = subprocess.Popen(('ruby', '-wc'),
                   stdin=subprocess.PIPE,
                   stdout=subprocess.PIPE,
                   stderr=subprocess.STDOUT,
-                  startupinfo=info)
+                  startupinfo=get_startupinfo())
     result = process.communicate(codeString)[0]
 
     return result
