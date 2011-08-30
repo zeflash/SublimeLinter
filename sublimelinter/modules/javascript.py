@@ -37,9 +37,9 @@ def check(codeString):
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT,
                                 startupinfo=get_startupinfo())
-
-    result = process.communicate(codeString)[0]
-    return json.loads(result)
+    return []  # FIXME: jshint is a javascript file... in my system this is not an executable file and process.communicate makes Sublime Text 2 crash for some reason
+    # result = process.communicate(codeString)[0]
+    # return json.loads(result)  # FIXME: if result is empty or has errors, json.loads() can throw a ValueError exception.
 
 
 def run(code, view, filename=None):
