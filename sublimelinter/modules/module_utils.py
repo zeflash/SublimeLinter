@@ -11,3 +11,10 @@ def get_startupinfo():
         info.wShowWindow = subprocess.SW_HIDE
 
     return info
+
+
+def execute_get_output(args):
+    try:
+        return subprocess.Popen(args, get_startupinfo()).communicate()[0]
+    except:
+        return ''

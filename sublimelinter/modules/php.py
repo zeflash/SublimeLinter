@@ -2,17 +2,16 @@
 
 import subprocess
 
-from utils import get_startupinfo
+from module_utils import get_startupinfo
 
 
 def is_enabled():
     try:
-        subprocess.Popen(('php', '-v'),
-                         startupinfo=get_startupinfo())
-    except OSError as (errno, message):
-        return (False, message)
+        subprocess.Popen(('php', '-v'), startupinfo=get_startupinfo())
+    except OSError:
+        return (False, 'php cannot be found')
 
-    return (True, '')
+    return True
 
 
 def check(codeString, args=[]):

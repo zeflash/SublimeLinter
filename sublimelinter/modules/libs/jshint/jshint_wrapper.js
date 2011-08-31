@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /*jshint node:true */
 
 /*
@@ -10,12 +9,14 @@
 
     The MIT License
     http://www.opensource.org/licenses/mit-license.php
+
+    usage: node /path/to/jshint_wrapper.js
 */
 
 var _fs = require('fs'),
     _sys = require('sys'),
     _path = require('path'),
-    _jshint = require('/usr/local/lib/node_modules/jshint/packages/jshint/jshint.js'),
+    _jshint = require(_path.join(_path.dirname(process.argv[1]), 'jshint.js')),
     _config;
 
 function _removeJsComments(str) {
@@ -83,6 +84,7 @@ function hint() {
         }
 
         _sys.puts(JSON.stringify(results));
+        process.exit(0);
     });
 }
 

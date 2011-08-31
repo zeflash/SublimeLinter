@@ -3,16 +3,16 @@
 import subprocess
 import sublime
 
-from utils import get_startupinfo
+from module_utils import get_startupinfo
 
 
 def is_enabled():
     try:
         subprocess.Popen(('perl', '-v'), startupinfo=get_startupinfo())
-    except OSError as (errno, message):
-        return (False, message)
+    except OSError:
+        return (False, 'perl cannot be found')
 
-    return (True, '')
+    return True
 
 
 def check(codeString, filename):
@@ -38,6 +38,7 @@ description =\
 
 def run(code, view, filename='untitled'):
     errors = check(code, filename)
+    print errors
 
     lines = set()
     underline = []  # leave this here for compatibility with original plugin
@@ -89,7 +90,7 @@ def run(code, view, filename='untitled'):
             near = match.group('near')
             if near:
                 error = '%s, near "%s"' % (error, near)
-                underlineRegex(lineno, '(?P<underline>%s)' % near)
+                underlineRegex(lineno, '(?P<underline>%s)'.format(re.escape(near)))
 
             lines.add(lineno)
             addMessage(lineno, error)

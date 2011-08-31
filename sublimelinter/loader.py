@@ -14,7 +14,7 @@ class Loader(object):
         self.basepath = 'sublimelinter/modules'
         self.linters = linters
         self.modpath = self.basepath.replace('/', '.')
-        self.ignored = ('__init__', 'utils')
+        self.ignored = ('__init__', 'module_utils')
         self.descriptions = descriptions
         self.fix_path()
         self.load_all()
@@ -74,7 +74,17 @@ class Loader(object):
 
         try:
             language = mod.language
-            is_enabled, reason = mod.is_enabled()
+            enabled = mod.is_enabled()
+
+            if isinstance(enabled, bool):
+                is_enabled = enabled
+                reason = ''
+            elif isinstance(enabled, tuple) and len(enabled) == 2:
+                is_enabled = enabled[0]
+                reason = enabled[1]
+            else:
+                is_enabled = False
+                reason = 'Could not determine the enabled state'
 
             if is_enabled:
                 print 'SublimeLinter: {0} enabled'.format(language)

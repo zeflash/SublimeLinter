@@ -19,7 +19,7 @@ description =\
 
 
 def is_enabled():
-    return (True, '')
+    return True
 
 
 def run(code, view):

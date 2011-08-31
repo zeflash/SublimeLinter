@@ -2,16 +2,16 @@
 
 import subprocess
 
-from utils import get_startupinfo
+from module_utils import get_startupinfo
 
 
 def is_enabled():
     try:
         subprocess.Popen(('ruby', '-v'), startupinfo=get_startupinfo())
-    except OSError as (errno, message):
-        return (False, message)
+    except OSError:
+        return (False, 'ruby cannot be found')
 
-    return (True, '')
+    return True
 
 
 def check(codeString, filename):

@@ -6,7 +6,7 @@ import os.path
 import subprocess
 import sublime
 
-from utils import get_startupinfo
+from module_utils import get_startupinfo
 
 __all__ = ['run', 'language']
 language = 'JavaScript'
@@ -18,28 +18,38 @@ description =\
 
 
 def jshint_path():
-    return os.path.join(os.path.dirname(__file__), 'libs', 'jshint.js')
+    return os.path.join(os.path.dirname(__file__), 'libs', 'jshint')
 
 
 def is_enabled():
     try:
-        process = subprocess.Popen(jshint_path(), startupinfo=get_startupinfo())
-        process.communicate('')
-    except OSError as (errno, message):
-        return (False, 'Cannot find or execute "{0}"'.format(jshint_path()))
-
-    return (True, '')
+        subprocess.call(['node', '-v'], startupinfo=get_startupinfo())
+        return True
+    except OSError:
+        return (False, 'node.js is required')
+    except Exception as ex:
+        return (False, unicode(ex))
 
 
 def check(codeString):
-    process = subprocess.Popen(jshint_path(),
+    path = jshint_path()
+    process = subprocess.Popen(['node', os.path.join(path, 'jshint_wrapper.js')],
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT,
                                 startupinfo=get_startupinfo())
 
-    result = process.communicate(codeString)[0]
-    return json.loads(result)
+    result = process.communicate(codeString)
+
+    if result:
+        if process.returncode == 0:
+            return json.loads(result[0].strip() or '[]')
+        else:
+            print '{0}: {1}'.format(language, result[0])
+    else:
+        print '{0}: no result returned from jshint'
+
+    return []
 
 
 def run(code, view, filename=None):

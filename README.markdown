@@ -9,7 +9,7 @@ Supports the following languages:
 * PHP - syntax checking via "php -l"
 * Perl - syntax+deprecation checking via "perl -c"
 * Ruby - syntax checking via "ruby -wc"
-* Javascript - lint via jshint (http://jshint.com)
+* Javascript - lint via node.js (you must install it, see http://nodejs.com) and built in jshint
 * Objective-J - lint via built-in capp_lint (https://github.com/aparajita/capp_lint)
 
 Installing
