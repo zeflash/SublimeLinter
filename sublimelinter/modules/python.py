@@ -232,20 +232,20 @@ def run(code, view, filename='untitled'):
             underlineRange(underlines, lineno, start + offset, end - start)
 
     def underlineWord(underlines, lineno, word):
-        regex = r'((and|or|not|if|elif|while|in)\s+|[+\-*^%%<>=\(\{])*\s*(?P<underline>[\w\.]*%s[\w]*)'.format(re.escape(word))
+        regex = r'((and|or|not|if|elif|while|in)\s+|[+\-*^%%<>=\(\{{])*\s*(?P<underline>[\w\.]*{0}[\w]*)'.format(re.escape(word))
         underlineRegex(underlines, lineno, regex, word)
 
     def underlineImport(underlines, lineno, word):
         linematch = '(from\s+[\w_\.]+\s+)?import\s+(?P<match>[^#;]+)'
-        regex = '(^|\s+|,\s*|as\s+)(?P<underline>[\w]*%s[\w]*)'.format(re.escape(word))
+        regex = '(^|\s+|,\s*|as\s+)(?P<underline>[\w]*{0}[\w]*)'.format(re.escape(word))
         underlineRegex(underlines, lineno, regex, word, linematch)
 
     def underlineForVar(underlines, lineno, word):
-        regex = 'for\s+(?P<underline>[\w]*%s[\w*])'.format(re.escape(word))
+        regex = 'for\s+(?P<underline>[\w]*{0}[\w*])'.format(re.escape(word))
         underlineRegex(underlines, lineno, regex, word)
 
     def underlineDuplicateArgument(underlines, lineno, word):
-        regex = 'def [\w_]+\(.*?(?P<underline>[\w]*%s[\w]*)'.format(re.escape(word))
+        regex = 'def [\w_]+\(.*?(?P<underline>[\w]*{0}[\w]*)'.format(re.escape(word))
         underlineRegex(underlines, lineno, regex, word)
 
     def addMessage(messages, lineno, message):

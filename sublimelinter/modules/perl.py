@@ -89,8 +89,8 @@ def run(code, view, filename='untitled'):
 
             near = match.group('near')
             if near:
-                error = '%s, near "%s"' % (error, near)
-                underlineRegex(lineno, '(?P<underline>%s)'.format(re.escape(near)))
+                error = '{0}, near "{1}"'.format(error, near)
+                underlineRegex(lineno, '(?P<underline>{0})'.format(re.escape(near)))
 
             lines.add(lineno)
             addMessage(lineno, error)
