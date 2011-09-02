@@ -1,8 +1,8 @@
 # jshint.py - sublimelint package for checking Javascript files
 
-import json
+import re
 import os
-import os.path
+import json
 import subprocess
 import sublime
 
@@ -16,12 +16,15 @@ description =\
         (jshint, assumed to be on $PATH) on current view.
 '''
 
+jsc_path = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
 
 def jshint_path():
     return os.path.join(os.path.dirname(__file__), 'libs', 'jshint')
 
-
 def is_enabled():
+    return True
+    if os.path.exists(jsc_path):
+        return True
     try:
         subprocess.call(['node', '-v'], startupinfo=get_startupinfo())
         return True
@@ -31,15 +34,24 @@ def is_enabled():
         return (False, unicode(ex))
 
 
-def check(codeString):
+def check(codeString, filename):
     path = jshint_path()
-    process = subprocess.Popen(['node', os.path.join(path, 'jshint_wrapper.js')],
-                                stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT,
-                                startupinfo=get_startupinfo())
+
+    if os.path.exists(jsc_path):
+        process = subprocess.Popen((jsc_path, os.path.join(path, 'jshint_jsc.js'), '--', filename, str(codeString.count('\n')), '{}', path + os.path.sep),
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    startupinfo=get_startupinfo())
+    else:
+        process = subprocess.Popen(('node', os.path.join(path, 'jshint_node.js')),
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    startupinfo=get_startupinfo())
 
     result = process.communicate(codeString)
+    print result
 
     if result:
         if process.returncode == 0:
@@ -52,9 +64,10 @@ def check(codeString):
     return []
 
 
-def run(code, view, filename=None):
+def run(code, view, filename='untitled'):
+
     try:
-        errors = check(code)
+        errors = check(code, filename)
     except OSError as (errno, message):
         print 'SublimeLinter: error executing linter: {0}'.format(message)
         errors = []
