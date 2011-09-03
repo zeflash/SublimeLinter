@@ -38,9 +38,6 @@ var process = function(args) {
         input += '\n' + readline();
     }
 
-    // Now read the last line without appending \n
-    input += readline();
-
     var results = [];
 
     if (!JSHINT(input, opts)) {
