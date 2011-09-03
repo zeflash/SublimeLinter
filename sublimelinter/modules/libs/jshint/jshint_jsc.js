@@ -33,6 +33,7 @@ var process = function(args) {
     }
 
     var input = readline();
+
     for (var i = 0; i < lineCount; ++i) {
         input += '\n' + readline();
     }
