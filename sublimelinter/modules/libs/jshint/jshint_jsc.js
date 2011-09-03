@@ -27,7 +27,7 @@ var process = function(args) {
             }
         })(args[1]);
 
-    if (!lineCount) {
+    if (isNaN(lineCount)) {
         print('jshint: Must provide number of lines to read from stdin.');
         quit();
     }
