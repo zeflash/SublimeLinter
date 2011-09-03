@@ -32,14 +32,9 @@ var process = function(args) {
         quit();
     }
 
-    var input = '',
-        i;
-
-    // For all but the last line we add \n
-    --lineCount;
-
-    for (i = 0; i < lineCount; ++i) {
-        input += readline() + '\n';
+    var input = readline();
+    for (var i = 0; i < lineCount; ++i) {
+        input += '\n' + readline();
     }
 
     // Now read the last line without appending \n
