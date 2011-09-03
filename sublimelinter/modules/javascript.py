@@ -1,6 +1,5 @@
 # jshint.py - sublimelint package for checking Javascript files
 
-import re
 import os
 import json
 import subprocess
@@ -18,18 +17,19 @@ description =\
 
 jsc_path = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
 
+
 def jshint_path():
     return os.path.join(os.path.dirname(__file__), 'libs', 'jshint')
 
+
 def is_enabled():
-    return True
     if os.path.exists(jsc_path):
-        return True
+        return (True, 'using JavaScriptCore')
     try:
         subprocess.call(['node', '-v'], startupinfo=get_startupinfo())
-        return True
+        return (True, 'using node.js')
     except OSError:
-        return (False, 'node.js is required')
+        return (False, 'JavaScriptCore or node.js is required')
     except Exception as ex:
         return (False, unicode(ex))
 
@@ -38,7 +38,7 @@ def check(codeString, filename):
     path = jshint_path()
 
     if os.path.exists(jsc_path):
-        process = subprocess.Popen((jsc_path, os.path.join(path, 'jshint_jsc.js'), '--', filename, str(codeString.count('\n')), '{}', path + os.path.sep),
+        process = subprocess.Popen((jsc_path, os.path.join(path, 'jshint_jsc.js'), '--', str(codeString.count('\n')), '{}', path + os.path.sep),
                                     stdin=subprocess.PIPE,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT,
@@ -51,11 +51,13 @@ def check(codeString, filename):
                                     startupinfo=get_startupinfo())
 
     result = process.communicate(codeString)
-    print result
 
     if result:
         if process.returncode == 0:
-            return json.loads(result[0].strip() or '[]')
+            if result[0].startswith('jshint: '):
+                print '{0}: {1}'.format(language, result[0][len('jshint: '):])
+            else:
+                return json.loads(result[0].strip() or '[]')
         else:
             print '{0}: {1}'.format(language, result[0])
     else:

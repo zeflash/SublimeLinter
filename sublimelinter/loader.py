@@ -87,7 +87,7 @@ class Loader(object):
                 reason = 'Could not determine the enabled state'
 
             if is_enabled:
-                print 'SublimeLinter: {0} enabled'.format(language)
+                print 'SublimeLinter: {0} enabled{1}'.format(language, ' ({0})'.format(reason) if reason else '')
                 self.linters[language] = mod
             else:
                 print 'SublimeLinter: {0} disabled ({1})'.format(language, reason)
