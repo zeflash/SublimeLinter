@@ -1,4 +1,5 @@
-# jshint.py - sublimelint package for checking Javascript files
+# -*- coding: utf-8 -*-
+# javascript.py - sublimelint package for checking Javascript files
 
 import os
 import json

@@ -286,12 +286,13 @@ def select_linter(view):
        current view'''
     disabled = view.settings().get('sublimelinter_disable', [])
     disabled = [lang.lower() for lang in disabled]
-    syntax = view.settings().get('syntax').lower()
+    syntax = os.path.basename(view.settings().get('syntax').lower())
+    syntax = os.path.splitext(syntax)[0]
 
     for language in LINTERS:
         lang = language.lower()
 
-        if lang in syntax and lang not in disabled:
+        if lang == syntax and lang not in disabled:
             return LINTERS[language]
     return None
 

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# module_utils.py - Miscellaneous utilities for use by linter modules.
+
 import os
 import subprocess
 
