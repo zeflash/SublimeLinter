@@ -1,22 +1,22 @@
-/*jshint boss: true */
+/*jshint boss: true, evil: true */
 
 // usage:
-//   jsc ${env_home}/jsc.js -- ${file} ${lines} "{option1:true,option2:false} ${env_home}"
-var env_home = '';
-if (arguments.length > 3) {
-  env_home = arguments[3].toString().replace(/\/env$/, '/');
+//   jsc ${envHome}/jsc.js -- ${lineCount} {option1:true,option2:false} ${envHome}
+var envHome = '';
+
+if (arguments.length > 2) {
+    envHome = arguments[2].toString().replace(/\/env$/, '/');
 }
-load(env_home + "jshint.js");
+
+load(envHome + "jshint.js");
 
 if (typeof(JSHINT) === 'undefined') {
-  print('jshint: Could not load jshint.js, tried "' + env_home + 'jshint.js".');
-  quit();
+    print('jshint: Could not load jshint.js, tried "' + envHome + 'jshint.js".');
+    quit();
 }
 
-(function(args){
-    var home  = args[3],
-        name  = args[0],
-        lines = eval(args[1]),
+var process = function(args) {
+    var lineCount = parseInt(args[0], 10),
         opts  = (function(arg){
             switch (arg) {
             case undefined:
@@ -25,36 +25,32 @@ if (typeof(JSHINT) === 'undefined') {
             default:
                 return eval('(' + arg + ')');
             }
-        })(args[2]);
-    
+        })(args[1]);
 
-    if (!name) {
-        print('jshint: No file name was provided.');
-        quit();
-    }
-
-    if (!lines) {
+    if (!lineCount) {
         print('jshint: Must provide number of lines to read from stdin.');
         quit();
     }
 
-    var input = '';
-    var _input, cnt = 0;
-    while(++cnt < lines && (_input = readline()) !== null) {
-        if (input) {
-            input = input + '\n';
-        }
-        input = input + _input;
+    var input = '',
+        i;
+
+    for (i = 0; i < lineCount; ++i) {
+        input += readline() + '\n';
     }
-    //print('>>>>',input,'<<<<');
 
     var results = [];
+
     if (!JSHINT(input, opts)) {
-        for (var i = 0, err; err = JSHINT.errors[i]; i++) {
+        var err;
+
+        for (i = 0; err = JSHINT.errors[i]; i++) {
             results.push(err);
         }
     }
 
     print(JSON.stringify(results));
     quit();
-})(arguments);
+};
+
+process(arguments);

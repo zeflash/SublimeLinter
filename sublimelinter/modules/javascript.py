@@ -38,7 +38,12 @@ def check(codeString, filename):
     path = jshint_path()
 
     if os.path.exists(jsc_path):
-        process = subprocess.Popen((jsc_path, os.path.join(path, 'jshint_jsc.js'), '--', str(codeString.count('\n')), '{}', path + os.path.sep),
+        lineCount = codeString.count('\n')
+
+        if codeString[-1] != '\n':
+            lineCount += 1
+
+        process = subprocess.Popen((jsc_path, os.path.join(path, 'jshint_jsc.js'), '--', unicode(lineCount), '{}', path + os.path.sep),
                                     stdin=subprocess.PIPE,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT,
