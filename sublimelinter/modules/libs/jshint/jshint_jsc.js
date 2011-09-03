@@ -35,9 +35,15 @@ var process = function(args) {
     var input = '',
         i;
 
+    // For all but the last line we add \n
+    --lineCount;
+
     for (i = 0; i < lineCount; ++i) {
         input += readline() + '\n';
     }
+
+    // Now read the last line without appending \n
+    input += readline();
 
     var results = [];
 
