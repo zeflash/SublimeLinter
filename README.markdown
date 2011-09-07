@@ -15,33 +15,42 @@ Supports the following languages:
 Installing
 -----
 
-*Without Git:* Download the latest source from http://github.com/Kronuz/SublimeLinter and copy sublimelinter_plugin.py and the SublimeLinter/ folder to your Sublime Text "User" packages directory.
+*With the Package Control plugin:* The easiest way to install SublimeLinter is through Package Control, which can be found here:
 
-*With Git:* Clone the repository in your Sublime Text Packages directory (located one folder above the "User" directory)
+    http://wbond.net/sublime_packages/package_control
+
+Once you install Package Control, restart ST2 and bring up the Command Palette (ctrl+shift+p [Windows, Linux] or cmd+shift+p [OS X]). Select "Package Control: Install Package", then select SublimeLinter. The advantage of using this method is that Package Control will automatically keep SublimeLinter up to date with the latest version.
+
+*Without Git:* Download the latest source from http://github.com/Kronuz/SublimeLinter and copy the SublimeLinter folder to your Sublime Text "Packages" directory.
+
+*With Git:* Clone the repository in your Sublime Text "Packages" directory:
 
 > git clone git://github.com/Kronuz/SublimeLinter.git
 
 
-The "User" packages directory is located at:
+The "Packages" directory is located at:
 
 * Windows:
-    %APPDATA%/Sublime Text 2/Packages/User/
+    %APPDATA%/Sublime Text 2/Packages/
 * OS X:
-    ~/Library/Application Support/Sublime Text 2/Packages/User/
+    ~/Library/Application Support/Sublime Text 2/Packages/
 * Linux:
-    ~/.Sublime Text 2/Packages/User/
+    ~/.Sublime Text 2/Packages/
 
 Using
 -----
+To enable the plugin to work by default, go to the Preferences menu and select "File Settings - User". Then add the following line to the array of prefs:
+    "sublimelinter": true,
 
-For detailed, up to date instructions, enter the following at the console
+Don't include the trailing comma if it is the last item in the prefs array.
+
+For detailed, up to date instructions on how to use and configure SublimeLinter, enter the following at the console
 
     view.run_command("lint")
 or
     view.run_command("lint", "help")
 
-1. To enable the plugin to work by default, you need to set a user preference "sublimelinter" to true.
-2. You can turn on/off the linter via a command view.run_command("linter_on") (or "linter_off") - even if you have not set a user preference before.
+You can turn on/off the linter via the command view.run_command("linter_on") (or "linter_off") -- even if you have not set a user preference before.
 
 Note that the linter normally works in a background thread and is constantly refreshing when enabled.
 
