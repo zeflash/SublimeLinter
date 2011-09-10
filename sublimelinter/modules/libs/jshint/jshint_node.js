@@ -11,8 +11,8 @@
     The MIT License
     http://www.opensource.org/licenses/mit-license.php
 
-    usage: node /path/to/jshint_wrapper.js {option1:true,option2:false}
-*/
+    usage: node /path/to/jshint_wrapper.js "{option1:true,option2:false}"
+    */
 
 var _fs = require('fs'),
     _sys = require('sys'),
