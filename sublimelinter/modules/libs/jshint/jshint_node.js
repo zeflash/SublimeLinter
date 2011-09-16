@@ -15,7 +15,7 @@
     */
 
 var _fs = require('fs'),
-    _sys = require('sys'),
+    _util = require('util'),
     _path = require('path'),
     _jshint = require(_path.join(_path.dirname(process.argv[1]), 'jshint.js')),
     _config;
@@ -49,7 +49,7 @@ function hint() {
             });
         }
 
-        _sys.puts(JSON.stringify(results));
+        _util.puts(JSON.stringify(results));
         process.exit(0);
     });
 }
