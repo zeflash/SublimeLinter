@@ -22,9 +22,21 @@ ERRORS = {}      # error messages on given line obtained from linter; they are
                  # displayed in the status bar when cursor is on line with error
 VIOLATIONS = {}  # violation messages, they are displayed in the status bar
 WARNINGS = {}    # warning messages, they are displayed in the status bar
+TIMES = {}       # collects how long it took the linting to complete
 HELP = []        # collects all "help" (docstring, etc.) information
 MOD_LOAD = Loader(os.getcwd(), LINTERS, HELP)  # utility to load (and reload
                  # if necessary) linter modules [useful when working on plugin]
+
+# For snappier linting, different delays are used for different linting times:
+# (linting time, delays)
+DELAYS = (
+    (800, (800, 2000)),
+    (400, (400, 1000)),
+    (200, (200, 500)),
+    (100, (100, 300)),
+    (50, (50, 100)),
+)
+
 
 HELP.insert(0,
 '''SublimeLinter command help
@@ -43,6 +55,13 @@ def help_collector(fn):
     for future display'''
     HELP.append(fn.__doc__)
     return fn
+
+
+def get_delay(t):
+    for _t, d in DELAYS:
+        if t >= _t:
+            return d
+    return DELAYS[-1][1]
 
 
 def last_selected_lineno(view):
@@ -78,6 +97,7 @@ def run_once(linter, view):
         highlight_notes(view)
         return
     vid = view.id()
+    start = time.time()
     text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
     if view.file_name():
         filename = view.file_name()  # os.path.split(view.file_name())[-1]
@@ -86,6 +106,8 @@ def run_once(linter, view):
     lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(text, view, filename)
     add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines)
     update_statusbar(view)
+    end = time.time()
+    TIMES[vid] = (end - start) * 1000  # Keep how long it took to lint
 
 
 def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines):
@@ -209,7 +231,7 @@ def highlight_notes(view):
         view.add_regions('lint-annotations', regions, "sublimelinter.annotations", sublime.DRAW_EMPTY_AS_OVERWRITE)
 
 
-def queue_linter(view, timeout=400, busy_timeout=1000):
+def queue_linter(view, timeout, busy_timeout):
     '''Put the current view in a queue to be examined by a linter'''
     if select_linter(view) is None:
         erase_lint_marks(view)  # may have changed file type and left marks behind
@@ -503,7 +525,8 @@ class BackgroundLinter(sublime_plugin.EventListener):
     def on_modified(self, view):
         if view.settings().get('repl'):
             return
-        queue_linter(view)
+        delay = get_delay(TIMES.get(view.id(), 100))
+        queue_linter(view, *delay)
 
     def on_load(self, view):
         if view.settings().get('repl'):
