@@ -173,7 +173,6 @@ def select_lint_region(view, region):
         underlineRegion = sublime.Region(region.begin(), region.begin())
 
     selected.add(underlineRegion)
-    print view.sel()
     view.show(underlineRegion, True)
 
 
