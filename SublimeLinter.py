@@ -230,7 +230,7 @@ def highlight_notes(view):
         view.add_regions('lint-annotations', regions, "sublimelinter.annotations", sublime.DRAW_EMPTY_AS_OVERWRITE)
 
 
-def queue_linter(view, timeout, busy_timeout):
+def queue_linter(view, timeout, busy_timeout, preemptive=False):
     '''Put the current view in a queue to be examined by a linter'''
     if select_linter(view) is None:
         erase_lint_marks(view)  # may have changed file type and left marks behind
@@ -247,7 +247,7 @@ def queue_linter(view, timeout, busy_timeout):
         except RuntimeError, excp:
             print excp
 
-    queue(view, _update_view, timeout, busy_timeout)
+    queue(view, _update_view, timeout, busy_timeout, preemptive)
 
 
 def background_linter():
@@ -458,7 +458,7 @@ class LintCommand(sublime_plugin.TextCommand):
         Turns background linting on.
         '''
         self.view.settings().set('sublimelinter', True)
-        queue_linter(self.view)
+        queue_linter(self.view, 0, 0, True)
 
     @help_collector
     def off(self):
@@ -540,7 +540,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
                 print 'SublimeLinter: reloading language:', module.language
                 MOD_LOAD.reload_module(module)
                 break
-        queue_linter(view, 0, 100)
+        queue_linter(view, 0, 0, True)
 
     def on_selection_modified(self, view):
         if view.settings().get('repl'):
