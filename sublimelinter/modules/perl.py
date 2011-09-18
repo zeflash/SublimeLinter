@@ -22,7 +22,8 @@ def is_enabled():
     linter_executable = get_executable('perl', 'perl')
 
     try:
-        subprocess.Popen((linter_executable, '-v'), startupinfo=get_startupinfo())
+        subprocess.Popen((linter_executable, '-v'), startupinfo=get_startupinfo(),
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
     except OSError:
         return (False, '"{0}" cannot be found'.format(linter_executable))
 
