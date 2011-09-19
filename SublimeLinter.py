@@ -522,18 +522,18 @@ class BackgroundLinter(sublime_plugin.EventListener):
         self.lastSelectedLineNo = -1
 
     def on_modified(self, view):
-        if view.settings().get('repl'):
+        if view.is_scratch():
             return
         delay = get_delay(TIMES.get(view.id(), 100))
         queue_linter(view, *delay)
 
     def on_load(self, view):
-        if view.settings().get('repl'):
+        if view.is_scratch():
             return
         background_run(select_linter(view), view)
 
     def on_post_save(self, view):
-        if view.settings().get('repl'):
+        if view.is_scratch():
             return
         for name, module in LINTERS.items():
             if module.__file__ == view.file_name():
@@ -543,7 +543,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
         queue_linter(view, 0, 0, True)
 
     def on_selection_modified(self, view):
-        if view.settings().get('repl'):
+        if view.is_scratch():
             return
         delay_queue(1000)  # on movement, delay queue (to make movement responsive)
 
@@ -629,7 +629,7 @@ class SublimelinterCommand(sublime_plugin.WindowCommand):
         view = self.window.active_view()
 
         if view:
-            if view.settings().get('repl'):
+            if view.is_scratch():
                 return False
 
         linter = select_linter(view, ignore_disabled=True)
