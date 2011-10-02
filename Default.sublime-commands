@@ -10,6 +10,11 @@
         "args": {"action": "on"}
     },
     {
+        "caption": "SublimeLinter: Enable Load-Save Linting",
+        "command": "sublimelinter_enable_load_save",
+        "args": {"action": "load-save"}
+    },
+    {
         "caption": "SublimeLinter: Disable Background Linting",
         "command": "sublimelinter_disable",
         "args": {"action": "off"}

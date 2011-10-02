@@ -57,11 +57,21 @@ def help_collector(fn):
     return fn
 
 
-def get_delay(t):
+def get_delay(t, view):
+    delay = 0
+
     for _t, d in DELAYS:
         if t >= _t:
-            return d
-    return DELAYS[-1][1]
+            delay = d
+    delay = DELAYS[-1][1]
+    minDelay = int(view.settings().get('sublimelinter_delay', 0) * 1000)
+
+    # If the user specifies a delay greater than the built in delay,
+    # figure they only want to see marks when idle.
+    if minDelay > delay[1]:
+        erase_lint_marks(view)
+
+    return (minDelay, minDelay) if minDelay > delay[1] else delay
 
 
 def last_selected_lineno(view):
@@ -84,9 +94,9 @@ def update_statusbar(view):
 
 def background_run(linter, view):
     '''run a linter on a given view if settings is set appropriately'''
-    if view.settings().get('sublimelinter', True):
-        if linter:
-            run_once(linter, view)
+    if linter:
+        run_once(linter, view)
+
     if view.settings().get('sublimelinter_notes'):
         highlight_notes(view)
 
@@ -401,6 +411,8 @@ class LintCommand(sublime_plugin.TextCommand):
             self.reset()
         elif lc_action == "on":
             self.on()
+        elif lc_action == "load-save":
+            self.enable_load_save()
         elif lc_action == "off":
             self.off()
         elif action.lower() in LINTERS:
@@ -461,6 +473,14 @@ class LintCommand(sublime_plugin.TextCommand):
         queue_linter(self.view, 0, 0, True)
 
     @help_collector
+    def enable_load_save(self):
+        '''* view.run_command("lint", "load-save")
+        Turns load-save linting on.
+        '''
+        self.view.settings().set('sublimelinter', 'load-save')
+        erase_lint_marks(self.view)
+
+    @help_collector
     def off(self):
         '''* view.run_command("lint", "off")
         Turns background linting off.
@@ -470,7 +490,9 @@ class LintCommand(sublime_plugin.TextCommand):
 
     def _run(self, name):
         '''runs an existing linter'''
-        if self.view.settings().get('sublimelinter'):
+        mode = self.view.settings().get('sublimelinter')
+
+        if mode == True or mode == "load-save":
             self.view.settings().set('sublimelinter', None)
         run_once(LINTERS[name.lower()], self.view)
 
@@ -524,17 +546,23 @@ class BackgroundLinter(sublime_plugin.EventListener):
     def on_modified(self, view):
         if view.is_scratch():
             return
-        delay = get_delay(TIMES.get(view.id(), 100))
+
+        if view.settings().get('sublimelinter') != True:
+            erase_lint_marks(view)
+            return
+
+        delay = get_delay(TIMES.get(view.id(), 100), view)
         queue_linter(view, *delay)
 
     def on_load(self, view):
-        if view.is_scratch():
+        if view.is_scratch() or view.settings().get('sublimelinter') == False:
             return
         background_run(select_linter(view), view)
 
     def on_post_save(self, view):
-        if view.is_scratch():
+        if view.is_scratch() or view.settings().get('sublimelinter') == False:
             return
+
         for name, module in LINTERS.items():
             if module.__file__ == view.file_name():
                 print 'SublimeLinter: reloading language:', module.language
@@ -633,7 +661,6 @@ class SublimelinterCommand(sublime_plugin.WindowCommand):
                 return False
 
         linter = select_linter(view, ignore_disabled=True)
-
         return linter is not None
 
     def run(self, action=''):
@@ -668,7 +695,20 @@ class SublimelinterLintCommand(SublimelinterCommand):
         if enabled:
             view = self.window.active_view()
 
-            if view and view.settings().get('sublimelinter', False):
+            if view and view.settings().get('sublimelinter') == True:
+                return False
+
+        return enabled
+
+
+class SublimelinterEnableLoadSaveCommand(SublimelinterCommand):
+    def is_enabled(self):
+        enabled = super(SublimelinterEnableLoadSaveCommand, self).is_enabled()
+
+        if enabled:
+            view = self.window.active_view()
+
+            if view and view.settings().get('sublimelinter') == 'load-save':
                 return False
 
         return enabled
@@ -681,7 +721,7 @@ class SublimelinterDisableCommand(SublimelinterCommand):
         if enabled:
             view = self.window.active_view()
 
-            if view and not view.settings().get('sublimelinter', False):
+            if view and not view.settings().get('sublimelinter') == True:
                 return False
 
         return enabled

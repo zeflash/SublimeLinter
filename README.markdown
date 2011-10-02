@@ -38,19 +38,18 @@ The "Packages" directory is located at:
 
 Using
 -----
-The best way to use SublimeLinter is as a background linter, which is the default behavior. Every time the text changes, a lint run is queued for execution. If you find that background linting slows down the UI too much, you can unset this user preference (or set it to false) and use the Control+Command+l (OS X) or Control+Alt+l (Linux/Windows) key equivalent or the Command Palette to run it only on demand.
+SublimeLinter runs in one of three modes, which is determined by the "sublimelinter" user setting:
 
-To disable background linting, go to the Preferences menu and select "File Settings - User". Then add the following line to the settings:
+* Background mode (the default) - When the "sublimelinter" setting is true, linting is performed in the background as you modify a file. If you like instant feedback, this is the best way to use SublimeLinter. If you want feedback, but not instantly, you can try another mode or set a minimum queue delay so that the linter will only run after a certain amount of idle time.
+* Load-save mode - When the "sublimelinter" setting is "load-save", linting is performed only when a file is loaded and after saving. Errors are cleared as soon as the file is modified.
+* On demand mode - When the "sublimelinter" setting is false, linting is performed only when initiated by you. Use the Control+Command+l (OS X) or Control+Alt+l (Linux/Windows) key equivalent or the Command Palette to lint the current file. If the current file has no associated linter, the command will not be available.
 
-    "sublimelinter": false,
-
-Don't include the trailing comma if it is the last item in the prefs array.
-
-Within a file whose language/syntax is supported by SublimeLinter, you control SublimeLinter via the Command Palette (Command+Shift+P on OS X, Control+Shift+P on Linux/Windows). The available commands are:
+Within a file whose language/syntax is supported by SublimeLinter, you can control SublimeLinter via the Command Palette (Command+Shift+P on OS X, Control+Shift+P on Linux/Windows). The available commands are:
 
 * SublimeLinter: Lint Current File — Lints the current file, highlights any errors and displays how many errors were found.
-* SublimeLinter: Enable Background Linting — Enables the background linter for the current view and lints it.
-* SublimeLinter: Disable Background Linting — Disables the background linter for the current view and clears all lint errors.
+* SublimeLinter: Enable Background Linting — Enables background linting mode for the current view and lints it.
+* SublimeLinter: Disable Background Linting — Disables background linting mode for the current view and clears all lint errors.
+* SublimeLinter: Enable Load-Save Linting — Enables load-save linting mode for the current view and clears all lint errors.
 * SublimeLinter: Reset — Clears all lint errors and enables background linting if it has not explicitly been disabled.
 * SublimeLinter: Show Commands — Shows commands available for use by other plugins or via the console.
 
