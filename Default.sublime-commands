@@ -20,13 +20,13 @@
         "args": {"action": "off"}
     },
     {
+        "caption": "SublimeLinter: Extract Annotations",
+        "command": "sublimelinter_annotations",
+        "args": {}
+    },
+    {
         "caption": "SublimeLinter: Reset",
         "command": "sublimelinter_lint",
         "args": {"action": "reset"}
-    },
-    {
-        "caption": "SublimeLinter: Show Commands",
-        "command": "sublimelinter",
-        "args": {"action": "help"}
     }
 ]
