@@ -4,9 +4,8 @@
 import os
 import re
 import tempfile
-import types
-
 import subprocess
+
 import sublime
 
 # If the linter uses an executable that takes stdin, use this input method.
@@ -111,7 +110,7 @@ class BaseLinter(object):
             return (True, 'built in')
         elif isinstance(self.executable, basestring):
             self.executable = self.get_mapped_executable(view, self.executable)
-        elif isinstance(self.executable, types.BooleanType) and self.executable == False:
+        elif isinstance(self.executable, bool) and self.executable == False:
             return (False, 'unknown error')
         else:
             return (False, 'bad type for CONFIG["executable"]')

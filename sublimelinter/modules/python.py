@@ -228,7 +228,7 @@ class Linter(BaseLinter):
             if isinstance(error, (Pep8Error, Pep8Warning)):
                 self.underline_range(view, error.lineno, error.col, underlines)
 
-            elif isinstance(error, (OffsetError, PythonError)):
+            elif isinstance(error, OffsetError):
                 self.underline_range(view, error.lineno, error.offset, underlines)
 
             elif isinstance(error, (pyflakes.messages.RedefinedWhileUnused,

@@ -400,26 +400,21 @@ def view_in_tab(view, title, text, file_type):
     return tab, _id
 
 
-def reload_modules():
-    lintersToReload = set()
+def lint_views(linter):
+    if not linter:
+        return
+
     viewsToLint = []
 
     for window in sublime.windows():
         for view in window.views():
-            for name, linter in LINTERS.items():
-                module = sys.modules[linter.__module__]
+            viewLinter = select_linter(view)
 
-                if module.__file__ == view.file_name():
-                    lintersToReload.add(linter)
-                    viewsToLint.append(view)
-                    break
-
-    for linter in lintersToReload:
-        print 'SublimeLinter: reloading language:', linter.language
-        MOD_LOAD.reload_module(sys.modules[linter.__module__])
+            if viewLinter == linter:
+                viewsToLint.append(view)
 
     for view in viewsToLint:
-        queue_linter(select_linter(view), view, 0, 0, True)
+        queue_linter(linter, view, 0, 0, True)
 
 
 def reload_view_module(view):
@@ -429,7 +424,7 @@ def reload_view_module(view):
         if module.__file__ == view.file_name():
             print 'SublimeLinter: reloading language:', linter.language
             MOD_LOAD.reload_module(module)
-            queue_linter(select_linter(view), view, 0, 0, True)
+            lint_views(linter)
             break
 
 
@@ -721,8 +716,3 @@ class SublimelinterDisableCommand(SublimelinterCommand):
                 return False
 
         return enabled
-
-
-class SublimelinterReloadCommand(SublimelinterWindowCommand):
-    def run_(self, args):
-        reload_modules()
