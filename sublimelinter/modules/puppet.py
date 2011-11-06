@@ -5,8 +5,6 @@ import re
 
 from base_linter import BaseLinter
 
-INPUT_METHOD_TEMP_FILE = 2
-
 CONFIG = {
     'language': 'Puppet',
     'executable': '/usr/bin/puppet',
