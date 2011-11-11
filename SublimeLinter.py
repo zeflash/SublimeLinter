@@ -23,20 +23,21 @@ MOD_LOAD = Loader(os.getcwd(), LINTERS)  # utility to load (and reload
 # For snappier linting, different delays are used for different linting times:
 # (linting time, delays)
 DELAYS = (
-    (800, (800, 2000)),
-    (400, (400, 1000)),
-    (200, (200, 500)),
-    (100, (100, 300)),
     (50, (50, 100)),
+    (100, (100, 300)),
+    (200, (200, 500)),
+    (400, (400, 1000)),
+    (800, (800, 2000)),
+    (1600, (1600, 3000)),
 )
 
 
 def get_delay(t, view):
     delay = 0
     for _t, d in DELAYS:
-        if _t >= t:
+        if _t <= t:
             delay = d
-    delay = delay or DELAYS[-1][1]
+    delay = delay or DELAYS[0][1]
 
     # If the user specifies a delay greater than the built in delay,
     # figure they only want to see marks when idle.
