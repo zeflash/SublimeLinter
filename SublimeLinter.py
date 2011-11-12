@@ -84,13 +84,7 @@ def run_once(linter, view):
     vid = view.id()
     start = time.time()
     text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
-
-    if view.file_name():
-        filename = view.file_name()  # os.path.split(view.file_name())[-1]
-    else:
-        filename = 'untitled'
-
-    lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(view, text, filename)
+    lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(view, text, view.file_name() or '')
     add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines)
     update_statusbar(view)
     end = time.time()
