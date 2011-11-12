@@ -10,10 +10,11 @@ SublimeLinter has built in linters for the following languages:
 
 * Javascript - lint via built in [jshint](http://jshint.org) run by JavaScriptCore on OS X or node.js on other platforms. You must install node.js, see [the node.js site](http://nodejs.com) for instructions.
 * Objective-J - lint via built-in [capp_lint](https://github.com/aparajita/capp_lint)
-* perl - syntax+deprecation checking via "perl -c"
-* php - syntax checking via "php -l"
 * python - native, moderately-complete lint
 * ruby - syntax checking via "ruby -wc"
+* php - syntax checking via "php -l"
+* java - lint via "javac -Xlint"
+* perl - syntax+deprecation checking via "perl -c"
 
 Installing
 ----------
