@@ -92,6 +92,7 @@ class BaseLinter(object):
             self.test_existence_args = (self.test_existence_args,)
 
         self.input_method = config.get('input_method', INPUT_METHOD_STDIN)
+        self.filename = None
         self.lint_args = config.get('lint_args', ())
 
         if isinstance(self.lint_args, basestring):
@@ -138,7 +139,19 @@ class BaseLinter(object):
         if hasattr(self, 'get_lint_args'):
             return self.get_lint_args(view, code, filename) or ()
         else:
-            return [arg.format(filename=filename) for arg in self.lint_args]
+            lintArgs = self.lint_args or []
+            settings = view.settings().get('SublimeLinter', {}).get(self.language, {})
+
+            if settings:
+                args = settings.get('lint_args', [])
+                lintArgs.extend(args)
+
+                cwd = settings.get('working_directory')
+
+                if cwd and os.path.isabs(cwd) and os.path.isdir(cwd):
+                    os.chdir(cwd)
+
+            return [arg.format(filename=filename) for arg in lintArgs]
 
     def built_in_check(self, view, code, filename):
         return ''
@@ -239,6 +252,8 @@ class BaseLinter(object):
             self.underline_range(view, lineno, start + offset, underlines, end - start)
 
     def run(self, view, code, filename=None):
+        self.filename = filename
+
         if self.executable is None:
             errors = self.built_in_check(view, code, filename)
         else:

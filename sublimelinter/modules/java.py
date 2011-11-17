@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 # java.py - sublimelint package for checking java files
 
+import os
+import os.path
 import re
 
-from base_linter import BaseLinter, INPUT_METHOD_TEMP_FILE
+from base_linter import BaseLinter, INPUT_METHOD_FILE
 
 CONFIG = {
     'language': 'java',
     'executable': 'javac',
     'test_existence_args': '-version',
-    'lint_args': ['-Xlint', '{filename}'],
-    'input_method': INPUT_METHOD_TEMP_FILE
+    'input_method': INPUT_METHOD_FILE
 }
 
-ERROR_RE = re.compile(r'.*\.java:(?P<line>\d+): (?P<warning>warning: )?(?:\[\w+\] )?(?P<error>.*)')
+ERROR_RE = re.compile(r'^(?P<path>.*\.java):(?P<line>\d+): (?P<warning>warning: )?(?:\[\w+\] )?(?P<error>.*)')
 MARK_RE = re.compile(r'^(?P<mark>\s*)\^$')
 
 
@@ -27,6 +28,11 @@ class Linter(BaseLinter):
             match = re.match(ERROR_RE, line)
 
             if match:
+                path = os.path.abspath(match.group('path'))
+
+                if path != self.filename:
+                    continue
+
                 lineNumber = int(match.group('line'))
                 warning = match.group('warning')
                 error = match.group('error')
