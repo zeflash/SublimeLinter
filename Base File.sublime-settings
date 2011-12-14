@@ -69,7 +69,8 @@
     // By deault, eval is allowed.
     "jshint_options":
     {
-        "evil": true
+        "evil": true,
+        "regexdash": true
     },
 
     // A list of pep8 error numbers to ignore. By default "line too long" errors are ignored.
