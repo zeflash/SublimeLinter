@@ -70,7 +70,11 @@
     "jshint_options":
     {
         "evil": true,
-        "regexdash": true
+        "regexdash": true,
+        "browser": true,
+        "wsh": true,
+        "trailing": true,
+        "sub": true
     },
 
     // A list of pep8 error numbers to ignore. By default "line too long" errors are ignored.
