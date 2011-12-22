@@ -36,7 +36,7 @@ class Linter(BaseLinter):
 
         if self.jshint_options is None:
             jshint_options = view.settings().get("jshint_options") or {}
-            jshint_options['indent'] = 1
+            jshint_options['indent'] = jshint_options.get('indent', 1)
             self.jshint_options = json.dumps(jshint_options)
 
         if self.use_jsc:
