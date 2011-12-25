@@ -65,6 +65,9 @@
     // If true, the find next/previous error commands will wrap.
     "sublimelinter_wrap_find": true,
 
+    // If true, when the file is saved any errors will appear in a popup list
+    "sublimelinter_popup_errors_on_save": false,
+
     // jshint: options for linting JavaScript. See http://jshint.com/#docs for more info.
     // By deault, eval is allowed.
     "jshint_options":

@@ -32,9 +32,9 @@ DELAYS = (
 )
 
 MARKS = {
-    "violation": ("", "dot"),
-    "warning": ("", "dot"),
-    "illegal": ("", "circle"),
+    'violation': ('', 'dot'),
+    'warning': ('', 'dot'),
+    'illegal': ('', 'circle'),
 }
 
 
@@ -61,13 +61,19 @@ def last_selected_lineno(view):
 def update_statusbar(view):
     vid = view.id()
     lineno = last_selected_lineno(view)
+    errors = []
 
     if vid in ERRORS and lineno in ERRORS[vid]:
-        view.set_status('Linter', '; '.join(ERRORS[vid][lineno]))
-    elif vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
-        view.set_status('Linter', '; '.join(VIOLATIONS[vid][lineno]))
-    elif vid in WARNINGS and lineno in WARNINGS[vid]:
-        view.set_status('Linter', '; '.join(WARNINGS[vid][lineno]))
+        errors.extend(ERRORS[vid][lineno])
+
+    if vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
+        errors.extend(VIOLATIONS[vid][lineno])
+
+    if vid in WARNINGS and lineno in WARNINGS[vid]:
+        errors.extend(WARNINGS[vid][lineno])
+
+    if errors:
+        view.set_status('Linter', '; '.join(errors))
     else:
         view.erase_status('Linter')
 
@@ -88,6 +94,9 @@ def run_once(linter, view, event=None, **kwargs):
         return
 
     vid = view.id()
+    ERRORS[vid] = {}
+    VIOLATIONS[vid] = {}
+    WARNINGS[vid] = {}
     start = time.time()
     text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
     lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(view, text, view.file_name() or '')
@@ -96,66 +105,97 @@ def run_once(linter, view, event=None, **kwargs):
     end = time.time()
     TIMES[vid] = (end - start) * 1000  # Keep how long it took to lint
 
-    if event == "on_post_save" and view.settings().get('sublimelinter_show_popup'):
-        show_popup(view, text, lines, error_underlines, violation_underlines, warning_underlines)
+    if event == 'on_post_save' and view.settings().get('sublimelinter_popup_errors_on_save'):
+        popup_error_list(view)
 
 
-def show_popup(view, text="", lines=set(), error_underlines=[], violation_underlines=[], warning_underlines=[]):
-    #TODO: Code re-use and put cursor at the exact error, not just head of line
-    view = view
+def popup_error_list(view):
     vid = view.id()
-    window = view.window()
+    errors = ERRORS[vid].copy()
 
-    text_lines = text.split("\n")
+    for message_map in [VIOLATIONS[vid], WARNINGS[vid]]:
+        for line, messages in message_map.items():
+            if line in errors:
+                errors[line].extend(messages)
+            else:
+                errors[line] = messages
 
-    # Messy way of creating the list to show in the pop-up. Open to suggestions on better design or formatting
-    l = []
-    l.extend([[str(k + 1) + ": " + v_, text_lines[k]] for k, v in VIOLATIONS[vid].iteritems() for v_ in v])
-    l.extend([[str(k + 1) + ": " + v_, text_lines[k]] for k, v in ERRORS[vid].iteritems() for v_ in v])
-    l.extend([[str(k + 1) + ": " + v_, text_lines[k]] for k, v in WARNINGS[vid].iteritems() for v_ in v])
+    error_regions = get_lint_regions(view)
+    index = 0
+    panel_items = []
 
-    # Sort by line number
-    the_list = sorted(l)
+    for line in sorted(errors.keys()):
+        line_errors = errors[line]
+        line_text = view.substr(view.full_line(view.text_point(line, 0)))
+        offset = 0
 
-    def jump(arg):
-        if arg == -1:
+        for message in line_errors:
+            region = error_regions[index]
+            row, column = view.rowcol(region.begin())
+            column += offset
+            offset += 1
+            line_text = '{0}^{1}'.format(line_text[0:column], line_text[column:])
+            index += 1
+
+        for message in line_errors:
+            item = [message, '{0}: {1}'.format(line, line_text)]
+            panel_items.append(item)
+
+    def on_done(selected_item):
+        if selected_item == -1:
             return
-        l = the_list[arg][0]
-        print l
-        line = int(l.split(":")[0]) - 1
 
-        pt = view.text_point(line, 0)
+        selected = view.sel()
+        selected.clear()
 
-        view.sel().clear()
-        view.sel().add(sublime.Region(pt))
+        # Traverse backwards to the first error on the line
+        region_begin = error_regions[selected_item].begin()
+        row, column = view.rowcol(region_begin)
 
-        view.show(pt)
-    window.show_quick_panel(the_list, jump)
+        while selected_item > 0:
+            previous_item = selected_item - 1
+            begin = error_regions[previous_item].begin()
+            previous_row, column = view.rowcol(begin)
+
+            if previous_row == row:
+                selected_item = previous_item
+            else:
+                region_begin = error_regions[selected_item].begin()
+                break
+
+        selected.add(sublime.Region(region_begin, region_begin))
+
+        # We have to force a move to update the cursor position
+        view.run_command('move', {'by': 'characters', 'forward': True})
+        view.run_command('move', {'by': 'characters', 'forward': False})
+
+    view.window().show_quick_panel(panel_items, on_done)
 
 
 def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines):
     '''Adds lint marks to view.'''
     vid = view.id()
     erase_lint_marks(view)
-    if warning_underlines:
-        view.add_regions('lint-underline-warning', warning_underlines, 'invalid.warning', sublime.DRAW_EMPTY_AS_OVERWRITE)
-    if violation_underlines:
-        view.add_regions('lint-underline-violation', violation_underlines, 'invalid.violation', sublime.DRAW_EMPTY_AS_OVERWRITE)
-    if error_underlines:
-        view.add_regions('lint-underline-illegal', error_underlines, 'invalid.illegal', sublime.DRAW_EMPTY_AS_OVERWRITE)
+    types = {'warning': warning_underlines, 'violation': violation_underlines, 'illegal': error_underlines}
+
+    for type_name, underlines in types.items():
+        if underlines:
+            view.add_regions('lint-underline-' + type_name, underlines, 'invalid.' + type_name, sublime.DRAW_EMPTY_AS_OVERWRITE)
+
     if lines:
         fill_outlines = view.settings().get('sublimelinter_fill_outlines', False)
         gutter_mark_enabled = True if view.settings().get('sublimelinter_gutter_marks', False) else False
 
         outlines = {'warning': [], 'violation': [], 'illegal': []}
 
-        for line in lines:
-            if line in ERRORS[vid]:
-                outlines['illegal'].append(view.full_line(view.text_point(line, 0)))
-            elif line in WARNINGS[vid]:
-                outlines['warning'].append(view.full_line(view.text_point(line, 0)))
-            elif line in VIOLATIONS[vid]:
-                outlines['violation'].append(view.full_line(view.text_point(line, 0)))
+        for line in ERRORS[vid]:
+            outlines['illegal'].append(view.full_line(view.text_point(line, 0)))
+
+        for line in WARNINGS[vid]:
+            outlines['warning'].append(view.full_line(view.text_point(line, 0)))
+
+        for line in VIOLATIONS[vid]:
+            outlines['violation'].append(view.full_line(view.text_point(line, 0)))
 
         for lint_type in outlines:
             if outlines[lint_type]:
@@ -180,10 +220,34 @@ def erase_lint_marks(view):
     view.erase_regions('lint-outlines-warning')
 
 
-def get_lint_regions(view):
-    regions = view.get_regions('lint-outlines-illegal')
-    regions.extend(view.get_regions('lint-outlines-violation'))
-    regions.extend(view.get_regions('lint-outlines-warning'))
+def get_lint_regions(view, reverse=False):
+    # First get all of the underlines, which includes every underlined character
+    regions = view.get_regions('lint-underline-illegal')
+    regions.extend(view.get_regions('lint-underline-violation'))
+    regions.extend(view.get_regions('lint-underline-warning'))
+
+    if not regions:
+        return regions
+
+    # Each of these regions is one character, so transform it into the character points
+    points = sorted([region.begin() for region in regions])
+
+    # Now coalesce adjacent characters into a single region
+    regions = []
+    last_point = -999
+
+    for point in points:
+        if point != last_point + 1:
+            regions.append(sublime.Region(point, point))
+        else:
+            region = regions[-1]
+            regions[-1] = sublime.Region(region.begin(), point)
+
+        last_point = point
+
+    if reverse:
+        regions.sort(key=lambda x: x.begin(), reverse=True)
+
     return regions
 
 
@@ -206,7 +270,7 @@ def find_underline_within(view, region):
     underlines = view.get_regions('lint-underline-illegal')
     underlines.extend(view.get_regions('lint-underline-violation'))
     underlines.extend(view.get_regions('lint-underline-warning'))
-    underlines.sort(key=lambda x: x.a)
+    underlines.sort(key=lambda x: x.begin())
 
     for underline in underlines:
         if region.contains(underline):
@@ -508,7 +572,6 @@ class LintCommand(sublime_plugin.TextCommand):
     def enable_load_save(self):
         '''Turns load-save linting on.'''
         self.view.settings().set('sublimelinter', 'load-save')
-        print self.view.settings().get('sublimelinter')
         erase_lint_marks(self.view)
 
     def off(self):
@@ -553,7 +616,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
     def on_load(self, view):
         if view.is_scratch() or view.settings().get('sublimelinter') == False:
             return
-        background_run(select_linter(view), view, event="on_load")
+        background_run(select_linter(view), view, event='on_load')
 
     def on_post_save(self, view):
         if view.is_scratch() or view.settings().get('sublimelinter') == False:
@@ -561,7 +624,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
 
         reload_view_module(view)
         linter = select_linter(view)
-        background_run(linter, view, event="on_post_save")
+        background_run(linter, view, event='on_post_save')
 
     def on_selection_modified(self, view):
         if view.is_scratch():
@@ -583,7 +646,7 @@ class FindLintErrorCommand(sublime_plugin.TextCommand):
         return select_linter(self.view) is not None
 
     def find_lint_error(self, forward):
-        regions = get_lint_regions(self.view)
+        regions = get_lint_regions(self.view, reverse=not forward)
 
         if len(regions) == 0:
             sublime.error_message('No lint errors.')
@@ -597,15 +660,11 @@ class FindLintErrorCommand(sublime_plugin.TextCommand):
         # If going backward, find the first region ending before the point.
         # If nothing is found in the given direction, wrap to the first/last region.
         if forward:
-            regions.sort(key=lambda x: x.a)
-
             for index, region in enumerate(regions):
                 if point < region.begin():
                     regionToSelect = region
                     break
         else:
-            regions.sort(key=lambda x: x.a, reverse=True)
-
             for index, region in enumerate(regions):
                 if point > region.end():
                     regionToSelect = region
@@ -621,6 +680,8 @@ class FindLintErrorCommand(sublime_plugin.TextCommand):
             select_lint_region(self.view, regionToSelect)
         else:
             sublime.error_message('No {0} lint errors.'.format('next' if forward else 'previous'))
+
+        return regionToSelect
 
 
 class FindNextLintErrorCommand(FindLintErrorCommand):
@@ -678,7 +739,7 @@ class SublimelinterAnnotationsCommand(SublimelinterWindowCommand):
         filename = view.file_name()
         notes = linter.extract_annotations(text, view, filename)
         _, filename = os.path.split(filename)
-        annotations_view, _id = view_in_tab(view, 'Annotations from %s' % filename, notes, '')
+        annotations_view, _id = view_in_tab(view, 'Annotations from {0}'.format(filename), notes, '')
 
 
 class SublimelinterCommand(SublimelinterWindowCommand):
@@ -697,11 +758,11 @@ class SublimelinterCommand(SublimelinterWindowCommand):
 
         if view and action:
             if action == 'lint':
-                self.lint_view(view)
+                self.lint_view(view, show_popup_list=args.get('show_popup', False))
             else:
                 view.run_command('lint', action)
 
-    def lint_view(self, view):
+    def lint_view(self, view, show_popup_list):
         linter = select_linter(view, ignore_disabled=True)
 
         if linter:
@@ -709,7 +770,10 @@ class SublimelinterCommand(SublimelinterWindowCommand):
             regions = get_lint_regions(view)
 
             if regions:
-                sublime.error_message('{0} lint error{1}.'.format(len(regions), 's' if len(regions) != 1 else ''))
+                if show_popup_list:
+                    popup_error_list(view)
+                else:
+                    sublime.error_message('{0} lint error{1}.'.format(len(regions), 's' if len(regions) != 1 else ''))
             else:
                 sublime.error_message('No lint errors.')
         else:
@@ -728,6 +792,11 @@ class SublimelinterLintCommand(SublimelinterCommand):
                 return False
 
         return enabled
+
+
+class SublimelinterShowErrorsCommand(SublimelinterCommand):
+    def is_enabled(self):
+        return super(SublimelinterShowErrorsCommand, self).is_enabled()
 
 
 class SublimelinterEnableLoadSaveCommand(SublimelinterCommand):

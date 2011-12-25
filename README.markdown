@@ -48,6 +48,7 @@ SublimeLinter runs in one of three modes, which is determined by the "sublimelin
 Within a file whose language/syntax is supported by SublimeLinter, you can control SublimeLinter via the Command Palette (Command+Shift+P on OS X, Control+Shift+P on Linux/Windows). The available commands are:
 
 * **SublimeLinter: Lint Current File** — Lints the current file, highlights any errors and displays how many errors were found. After using this command, the current view will not be linted until requested by this command or until background or load-save linting mode is enabled.
+* **SublimeLinter: Show Error List** — Lints the current file, highlights any errors and displays a quick panel with any errors that are found. Selecting an item from the quick panel jumps to that line.
 * **SublimeLinter: Enable Background Linting** — Enables background linting mode for the current view and lints it.
 * **SublimeLinter: Disable Background Linting** — Disables background linting mode for the current view and clears all lint errors.
 * **SublimeLinter: Enable Load-Save Linting** — Enables load-save linting mode for the current view and clears all lint errors.
@@ -57,7 +58,13 @@ Depending on the file and the current state of background enabling, some of the 
 
 When an error is highlighted by the linter, putting the cursor on the offending line will result in the error message being displayed on the status bar.
 
-You can quickly move to the next/previous lint error with the following key equivalents:
+If you want to be shown a popup list of all errors whenever a file is saved, modify the user setting:
+
+    "sublimelinter_popup_errors_on_save": true
+
+If there are errors in the file, a quick panel will appear which shows the error message, line number and source code for each error. The starting location of all errors on the line are marked with "^". Selecting an error in the quick panel jumps directly to the location of the first error on that line.
+
+While editing a file, you can quickly move to the next/previous lint error with the following key equivalents:
 
 **OS X**
 next: Control+Command+e
