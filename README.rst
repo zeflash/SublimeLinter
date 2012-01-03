@@ -8,8 +8,8 @@ can be quickly located.
 
 SublimeLinter has built in linters for the following languages:
 
-* Javascript - lint via built in [jshint](http://jshint.org)
-* Objective-J - lint via built-in [capp_lint](https://github.com/aparajita/capp_lint)
+* Javascript - lint via built in `jshint <http://jshint.org>`_
+* Objective-J - lint via built-in `capp_lint <https://github.com/aparajita/capp_lint>`_
 * python - native, moderately-complete lint
 * ruby - syntax checking via "ruby -wc"
 * php - syntax checking via "php -l"
@@ -23,11 +23,11 @@ SublimeLinter has built in linters for the following languages:
 
 Installing
 ----------
-**With the Package Control plugin:** The easiest way to install SublimeLinter is through Package Control, which can be found at this site: [http://wbond.net/sublime_packages/package_control](http://wbond.net/sublime_packages/package_control)
+**With the Package Control plugin:** The easiest way to install SublimeLinter is through Package Control, which can be found at this site: http://wbond.net/sublime_packages/package_control
 
-Once you install Package Control, restart ST2 and bring up the Command Palette (Command+Shift+p on OS X, Control+Shift+p on Linux/Windows). Select "Package Control: Install Package", wait while Package Control fetches the latest package list, then select SublimeLinter when the list appears. The advantage of using this method is that Package Control will automatically keep SublimeLinter up to date with the latest version.
+Once you install Package Control, restart ST2 and bring up the Command Palette (``Command+Shift+P`` on OS X, ``Control+Shift+P`` on Linux/Windows). Select "Package Control: Install Package", wait while Package Control fetches the latest package list, then select SublimeLinter when the list appears. The advantage of using this method is that Package Control will automatically keep SublimeLinter up to date with the latest version.
 
-**Without Git:** Download the latest source from `github <http://github.com/Kronuz/SublimeLinter>`_ and copy the SublimeLinter folder to your Sublime Text "Packages" directory.
+**Without Git:** Download the latest source from `GitHub <http://github.com/Kronuz/SublimeLinter>`_ and copy the SublimeLinter folder to your Sublime Text "Packages" directory.
 
 **With Git:** Clone the repository in your Sublime Text "Packages" directory::
 
@@ -69,7 +69,7 @@ Depending on the file and the current state of background enabling, some of the 
 
 When an error is highlighted by the linter, putting the cursor on the offending line will result in the error message being displayed on the status bar.
 
-If you want to be shown a popup list of all errors whenever a file is saved, modify the user setting:
+If you want to be shown a popup list of all errors whenever a file is saved, modify the user setting::
 
     "sublimelinter_popup_errors_on_save": true
 
@@ -77,22 +77,25 @@ If there are errors in the file, a quick panel will appear which shows the error
 
 While editing a file, you can quickly move to the next/previous lint error with the following key equivalents:
 
-**OS X**
-next: Control+Command+e
-prev: Control+Command+Shift+e
+* **OS X**::
 
-**Linux, Windows**
-next: Control+Alt+e
-prev: Control+Alt+Shift+e
+    next: Control+Command+e
+    prev: Control+Command+Shift+e
 
-By default the search will wrap. You can turn wrapping off with the user setting:
+* **Linux, Windows**::
+
+    next: Control+Alt+e
+    prev: Control+Alt+Shift+e
+
+By default the search will wrap. You can turn wrapping off with the user setting::
 
     "sublimelinter_wrap_find": false
 
-### Linter-specific notes
+Linter-specific notes
+~~~~~~~~~~~~~~~~~~~~~
 Following are notes specific to individual linters that you should be aware of:
 
-* **JavaScript** – This linter runs jshint.js using JavaScriptCore on Mac OS X or node.js on other platforms, which can be downloaded from [the node.js site](http://nodejs.org/#download). After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings.
+* **JavaScript** – This linter runs jshint.js using JavaScriptCore on Mac OS X or node.js on other platforms, which can be downloaded from `the node.js site <http://nodejs.org/#download>`_. After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings.
 
 * **java** – Because it uses ``javac`` to do linting, each time you run the linter the entire dependency graph of the current file will be checked. Depending on the number of classes you import, this can be **extremely** slow. Also note that you **must** provide the ``-sourcepath``, ``-classpath``, ``-Xlint`` and ``{filename}`` arguments to ``javac`` in your per-project settings. See "Per-project settings" below for more information.
 
@@ -100,8 +103,9 @@ Configuring
 -----------
 There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``.
 
-### Per-project settings
-SublimeLinter supports per-project/per-language settings. This is useful if a linter requires path configuration on a per-project basis. To edit your project settings, select the menu item ``Project->Edit Project``. If there is no "settings" object at the top level, add one and then add a "SublimeLinter" sub-object, like this:
+Per-project settings
+~~~~~~~~~~~~~~~~~~~~
+SublimeLinter supports per-project/per-language settings. This is useful if a linter requires path configuration on a per-project basis. To edit your project settings, select the menu item ``Project->Edit Project``. If there is no "settings" object at the top level, add one and then add a "SublimeLinter" sub-object, like this::
 
     {
         "folders":
@@ -123,7 +127,7 @@ Within the "SublimeLinter" object, you can add a settings object for each langua
 * "working_directory" – If present and a valid absolute directory path, the working directory is set to this path before the linter executes. This is useful if you are providing linter arguments that contain paths and you want to use working directory-relative paths instead of absolute paths.
 * "lint_args" – If present, it must be a sequence of string arguments to pass to the linter. If your linter expects a filename as an argument, use the argument "{filename}" as a placeholder. Note that if you provide this item, you are responsible for passing **all** required arguments to the linter.
 
-For example, let's say we are editing a Java project and want to use the "java" linter, which requires a source path and class path. In addition, we want to ignore serialization errors. Our project settings might look like this:
+For example, let's say we are editing a Java project and want to use the "java" linter, which requires a source path and class path. In addition, we want to ignore serialization errors. Our project settings might look like this::
 
     {
         "folders":
@@ -153,7 +157,8 @@ For example, let's say we are editing a Java project and want to use the "java" 
     }
 
 
-### Customizing colors
+Customizing colors
+~~~~~~~~~~~~~~~~~~
 There are three types of "errors" flagged by sublime lint: illegal,
 violation, and warning. For each type, SublimeLinter will indicate the offending
 line and the character position at which the error occurred on the line.
@@ -170,7 +175,7 @@ or define separate substyles for one or more types to color them differently.
 Most themes have an "invalid" theme style defined by default.
 
 If you want to make the offending lines glaringly obvious (perhaps for those
-who tend to ignore lint errors), you can set the user setting:
+who tend to ignore lint errors), you can set the user setting::
 
     "sublimelinter_fill_outlines": true
 
@@ -178,12 +183,12 @@ When this is set true, lines that have errors will be colored with the backgroun
 and foreground color of the "sublime.<type>" theme style. Unless you have defined
 those styles, this setting should be left false.
 
-You may also mark lines with errors by putting an "x" in the gutter with the user setting:
+You may also mark lines with errors by putting an "x" in the gutter with the user setting::
 
     "sublimelinter_gutter_marks": true
 
 To customize the colors used for highlighting errors and user notes, add the following
-to your theme (adapting the color to your liking):
+to your theme (adapting the color to your liking)::
 
     <dict>
         <key>name</key>
@@ -271,9 +276,10 @@ to your theme (adapting the color to your liking):
         </dict>
     </dict>
 
+
 Troubleshooting
 ---------------
-If a linter does not seem to be working, you can check the ST2 console to see if it was enabled. When SublimeLinter is loaded, you will see messages in the console like this:
+If a linter does not seem to be working, you can check the ST2 console to see if it was enabled. When SublimeLinter is loaded, you will see messages in the console like this::
 
     Reloading plugin /Users/aparajita/Library/Application Support/Sublime Text 2/Packages/SublimeLinter/sublimelinter_plugin.py
     SublimeLinter: JavaScript loaded
@@ -285,12 +291,12 @@ If a linter does not seem to be working, you can check the ST2 console to see if
     SublimeLinter: ruby loaded
     SublimeLinter: pylint loaded
 
-The first time a linter is asked to lint, it will check to see if it can be enabled. You will then see messages like this:
+The first time a linter is asked to lint, it will check to see if it can be enabled. You will then see messages like this::
 
     SublimeLinter: JavaScript enabled (using JavaScriptCore)
     SublimeLinter: Ruby enabled (using "ruby" for executable)
 
-Let's say the ruby linter is not working. If you look at the console, you may see a message like this:
+Let's say the ruby linter is not working. If you look at the console, you may see a message like this::
 
     SublimeLinter: ruby disabled ("ruby" cannot be found)
 
