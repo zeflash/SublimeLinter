@@ -27,19 +27,25 @@ Installing
 
 Once you install Package Control, restart ST2 and bring up the Command Palette (Command+Shift+p on OS X, Control+Shift+p on Linux/Windows). Select "Package Control: Install Package", wait while Package Control fetches the latest package list, then select SublimeLinter when the list appears. The advantage of using this method is that Package Control will automatically keep SublimeLinter up to date with the latest version.
 
-**Without Git:** Download the latest source from [github](http://github.com/Kronuz/SublimeLinter) and copy the SublimeLinter folder to your Sublime Text "Packages" directory.
+**Without Git:** Download the latest source from `github <http://github.com/Kronuz/SublimeLinter>`_ and copy the SublimeLinter folder to your Sublime Text "Packages" directory.
 
-**With Git:** Clone the repository in your Sublime Text "Packages" directory:
+**With Git:** Clone the repository in your Sublime Text "Packages" directory::
 
     git clone git://github.com/Kronuz/SublimeLinter.git
 
+
 The "Packages" directory is located at:
 
-* OS X:
+* OS X::
+
     ~/Library/Application Support/Sublime Text 2/Packages/
-* Linux:
+
+* Linux::
+
     ~/.Sublime Text 2/Packages/
-* Windows:
+
+* Windows::
+
     %APPDATA%/Sublime Text 2/Packages/
 
 Using
@@ -88,14 +94,14 @@ Following are notes specific to individual linters that you should be aware of:
 
 * **JavaScript** – This linter runs jshint.js using JavaScriptCore on Mac OS X or node.js on other platforms, which can be downloaded from [the node.js site](http://nodejs.org/#download). After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings.
 
-* **java** – Because it uses `javac` to do linting, each time you run the linter the entire dependency graph of the current file will be checked. Depending on the number of classes you import, this can be **extremely** slow. Also note that you **must** provide the `-sourcepath`, `-classpath`, `-Xlint` and `{filename}` arguments to `javac` in your per-project settings. See "Per-project settings" below for more information.
+* **java** – Because it uses ``javac`` to do linting, each time you run the linter the entire dependency graph of the current file will be checked. Depending on the number of classes you import, this can be **extremely** slow. Also note that you **must** provide the ``-sourcepath``, ``-classpath``, ``-Xlint`` and ``{filename}`` arguments to ``javac`` in your per-project settings. See "Per-project settings" below for more information.
 
 Configuring
 -----------
-There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item `Preferences->Package Settings->SublimeLinter->Settings - Default`.
+There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``.
 
 ### Per-project settings
-SublimeLinter supports per-project/per-language settings. This is useful if a linter requires path configuration on a per-project basis. To edit your project settings, select the menu item `Project->Edit Project`. If there is no "settings" object at the top level, add one and then add a "SublimeLinter" sub-object, like this:
+SublimeLinter supports per-project/per-language settings. This is useful if a linter requires path configuration on a per-project basis. To edit your project settings, select the menu item ``Project->Edit Project``. If there is no "settings" object at the top level, add one and then add a "SublimeLinter" sub-object, like this:
 
     {
         "folders":
@@ -298,8 +304,8 @@ If you wish to create a new linter to support a new language, SublimeLinter make
 
 * Configure the CONFIG dict in your module. See the comments in base\_linter.py for information on the values in that dict. You only need to set the values in your module that differ from the defaults in base\_linter.py, as your module's CONFIG is merged with the default. Note that if your linter uses an external executable that does not take stdin, setting 'input\_method' to INPUT\_METHOD\_TEMP\_FILE will allow interactive linting with that executable.
 
-* If your linter uses built in code, override `built_in_check()` and return the errors found.
+* If your linter uses built in code, override ``built_in_check()`` and return the errors found.
 
-* Override `parse_errors()` and process the errors. If your linter overrides `built_in_check()`, `parse_errors()` will receive the result of that method. If your linter uses an external executable, `parse_errors()` receives the raw output of the executable, stripped of leading and trailing whitespace.
+* Override ``parse_errors()`` and process the errors. If your linter overrides ``built_in_check()``, ``parse_errors()`` will receive the result of that method. If your linter uses an external executable, ``parse_errors()`` receives the raw output of the executable, stripped of leading and trailing whitespace.
 
 If your linter has more complex requirements, see the comments for CONFIG in base\_linter.py, and use the existing linters as guides.
