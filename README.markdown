@@ -16,6 +16,11 @@ SublimeLinter has built in linters for the following languages:
 * java - lint via "javac -Xlint"
 * perl - syntax+deprecation checking via "perl -c"
 
+.. image:: http://pledgie.com/campaigns/16512.png?skin_name=chrome
+   :alt: Click here to lend your support to SublimeLinter and make a donation at pledgie.com!
+   :target: http://pledgie.com/campaigns/16512
+
+
 Installing
 ----------
 **With the Package Control plugin:** The easiest way to install SublimeLinter is through Package Control, which can be found at this site: [http://wbond.net/sublime_packages/package_control](http://wbond.net/sublime_packages/package_control)
