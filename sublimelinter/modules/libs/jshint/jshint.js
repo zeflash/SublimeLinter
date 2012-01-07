@@ -967,7 +967,7 @@ var JSHINT = (function () {
         w.reason = m.supplant(w);
         JSHINT.errors.push(w);
         if (option.passfail) {
-            quit('Stopping. ', l, ch);
+            quit('Stopping.', l, ch);
         }
         warnings += 1;
         if (warnings >= option.maxerr) {
