@@ -134,11 +134,11 @@ def popup_error_list(view):
             row, column = view.rowcol(region.begin())
             column += offset
             offset += 1
-            line_text = '{0}^{1}'.format(line_text[0:column], line_text[column:])
+            line_text = u'{0}^{1}'.format(line_text[0:column], line_text[column:])
             index += 1
 
         for message in line_errors:
-            item = [message, '{0}: {1}'.format(line, line_text)]
+            item = [message, u'{0}: {1}'.format(line + 1, line_text.strip())]
             panel_items.append(item)
 
     def on_done(selected_item):
@@ -168,6 +168,7 @@ def popup_error_list(view):
         # We have to force a move to update the cursor position
         view.run_command('move', {'by': 'characters', 'forward': True})
         view.run_command('move', {'by': 'characters', 'forward': False})
+        view.show_at_center(region_begin)
 
     view.window().show_quick_panel(panel_items, on_done)
 
@@ -222,33 +223,46 @@ def erase_lint_marks(view):
 
 def get_lint_regions(view, reverse=False):
     # First get all of the underlines, which includes every underlined character
-    regions = view.get_regions('lint-underline-illegal')
-    regions.extend(view.get_regions('lint-underline-violation'))
-    regions.extend(view.get_regions('lint-underline-warning'))
-
-    if not regions:
-        return regions
+    underlines = view.get_regions('lint-underline-illegal')
+    underlines.extend(view.get_regions('lint-underline-violation'))
+    underlines.extend(view.get_regions('lint-underline-warning'))
 
     # Each of these regions is one character, so transform it into the character points
-    points = sorted([region.begin() for region in regions])
+    points = sorted([region.begin() for region in underlines])
 
     # Now coalesce adjacent characters into a single region
-    regions = []
+    underlines = []
     last_point = -999
 
     for point in points:
         if point != last_point + 1:
-            regions.append(sublime.Region(point, point))
+            underlines.append(sublime.Region(point, point))
         else:
-            region = regions[-1]
-            regions[-1] = sublime.Region(region.begin(), point)
+            region = underlines[-1]
+            underlines[-1] = sublime.Region(region.begin(), point)
 
         last_point = point
 
-    if reverse:
-        regions.sort(key=lambda x: x.begin(), reverse=True)
+    # Now get all outlines, which includes the entire line where underlines are
+    outlines = view.get_regions('lint-outlines-illegal')
+    outlines.extend(view.get_regions('lint-outlines-violation'))
+    outlines.extend(view.get_regions('lint-outlines-warning'))
 
-    return regions
+    # If an outline region contains an underline region, use only the underline
+    regions = underlines
+
+    for outline in outlines:
+        contains_underlines = False
+
+        for underline in underlines:
+            if outline.contains(underline):
+                contains_underlines = True
+                break
+
+        if not contains_underlines:
+            regions.append(outline)
+
+    return sorted(regions, key=lambda x: x.begin(), reverse=reverse)
 
 
 def select_lint_region(view, region):
@@ -581,7 +595,6 @@ class LintCommand(sublime_plugin.TextCommand):
 
     def _run(self, name):
         '''runs an existing linter'''
-        self.view.settings().set('sublimelinter', False)
         run_once(LINTERS[name.lower()], self.view)
 
 
