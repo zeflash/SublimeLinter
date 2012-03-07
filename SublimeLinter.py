@@ -55,7 +55,10 @@ def get_delay(t, view):
 
 
 def last_selected_lineno(view):
-    return view.rowcol(view.sel()[0].end())[0]
+    viewSel = view.sel()
+    if viewSel:
+        viewRowcol = view.rowcol(viewSel[0].end())
+    return viewRowcol[0] if viewRowcol else None
 
 
 def update_statusbar(view):
