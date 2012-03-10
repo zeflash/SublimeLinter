@@ -56,9 +56,9 @@ def get_delay(t, view):
 
 def last_selected_lineno(view):
     viewSel = view.sel()
-    if viewSel:
-        viewRowcol = view.rowcol(viewSel[0].end())
-    return viewRowcol[0] if viewRowcol else None
+    if not viewSel:
+        return None
+    return view.rowcol(viewSel[0].end())[0]
 
 
 def update_statusbar(view):
@@ -66,14 +66,15 @@ def update_statusbar(view):
     lineno = last_selected_lineno(view)
     errors = []
 
-    if vid in ERRORS and lineno in ERRORS[vid]:
-        errors.extend(ERRORS[vid][lineno])
+    if lineno:
+        if vid in ERRORS and lineno in ERRORS[vid]:
+            errors.extend(ERRORS[vid][lineno])
 
-    if vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
-        errors.extend(VIOLATIONS[vid][lineno])
+        if vid in VIOLATIONS and lineno in VIOLATIONS[vid]:
+            errors.extend(VIOLATIONS[vid][lineno])
 
-    if vid in WARNINGS and lineno in WARNINGS[vid]:
-        errors.extend(WARNINGS[vid][lineno])
+        if vid in WARNINGS and lineno in WARNINGS[vid]:
+            errors.extend(WARNINGS[vid][lineno])
 
     if errors:
         view.set_status('Linter', '; '.join(errors))
