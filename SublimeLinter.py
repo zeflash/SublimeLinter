@@ -37,6 +37,22 @@ MARKS = {
     'illegal': ('', 'circle'),
 }
 
+ALL_SETTINGS = [
+    'sublimelinter',
+    'sublimelinter_executable_map',
+    'sublimelinter_syntax_map',
+    'sublimelinter_disable',
+    'sublimelinter_delay',
+    'sublimelinter_fill_outlines',
+    'sublimelinter_gutter_marks',
+    'sublimelinter_wrap_find',
+    'sublimelinter_popup_errors_on_save',
+    'jshint_options',
+    'pep8_ignore',
+    'pyflakes_ignore',
+    'pyflakes_ignore_import_*',
+    'sublimelinter_objj_check_ascii',
+]
 
 def get_delay(t, view):
     delay = 0
@@ -553,6 +569,7 @@ class LintCommand(sublime_plugin.TextCommand):
     def __init__(self, view):
         self.view = view
         self.help_called = False
+        self._reload_settings()
 
     def run_(self, action):
         '''method called by default via view.run_command;
@@ -576,11 +593,19 @@ class LintCommand(sublime_plugin.TextCommand):
         elif action.lower() in LINTERS:
             self._run(lc_action)
 
+    def _reload_settings(self):
+        '''Restores user settings.'''
+        settings = sublime.load_settings('SublimeLinter.sublime-settings')
+        for setting in ALL_SETTINGS:
+            if settings.get(setting) != None:
+                self.view.settings().set(setting, settings.get(setting))
+
     def reset(self):
         '''Removes existing lint marks and restores user settings.'''
         erase_lint_marks(self.view)
-        settings = sublime.load_settings('SublimeLinter.sublime-settings')
-        self.view.settings().set('sublimelinter', settings.get('sublimelinter', True))
+        self._reload_settings()
+        if self.view.settings().get('sublimelinter') == None:
+            self.view.settings().set('sublimelinter', True)
 
     def on(self):
         '''Turns background linting on.'''
