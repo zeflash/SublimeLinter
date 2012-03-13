@@ -54,6 +54,7 @@ ALL_SETTINGS = [
     'sublimelinter_objj_check_ascii',
 ]
 
+
 def get_delay(t, view):
     delay = 0
     for _t, d in DELAYS:
@@ -563,13 +564,22 @@ def reload_view_module(view):
             break
 
 
+def reload_settings(view):
+    '''Restores user settings.'''
+    settings = sublime.load_settings(__name__ + '.sublime-settings')
+    for setting in ALL_SETTINGS:
+        if settings.get(setting) != None:
+            view.settings().set(setting, settings.get(setting))
+    if view.settings().get('sublimelinter') == None:
+        view.settings().set('sublimelinter', True)
+
+
 class LintCommand(sublime_plugin.TextCommand):
     '''command to interact with linters'''
 
     def __init__(self, view):
         self.view = view
         self.help_called = False
-        self._reload_settings()
 
     def run_(self, action):
         '''method called by default via view.run_command;
@@ -593,19 +603,10 @@ class LintCommand(sublime_plugin.TextCommand):
         elif action.lower() in LINTERS:
             self._run(lc_action)
 
-    def _reload_settings(self):
-        '''Restores user settings.'''
-        settings = sublime.load_settings('SublimeLinter.sublime-settings')
-        for setting in ALL_SETTINGS:
-            if settings.get(setting) != None:
-                self.view.settings().set(setting, settings.get(setting))
-
     def reset(self):
         '''Removes existing lint marks and restores user settings.'''
         erase_lint_marks(self.view)
-        self._reload_settings()
-        if self.view.settings().get('sublimelinter') == None:
-            self.view.settings().set('sublimelinter', True)
+        reload_settings(self.view)
 
     def on(self):
         '''Turns background linting on.'''
@@ -656,6 +657,7 @@ class BackgroundLinter(sublime_plugin.EventListener):
         queue_linter(linter, view, *delay)
 
     def on_load(self, view):
+        reload_settings(view)
         if view.is_scratch() or view.settings().get('sublimelinter') == False:
             return
         background_run(select_linter(view), view, event='on_load')
