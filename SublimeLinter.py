@@ -37,6 +37,8 @@ MARKS = {
     'illegal': ('', 'circle'),
 }
 
+# All available settings for SublimeLinter;
+# only these are inherited from SublimeLinter.sublime-settings
 ALL_SETTINGS = [
     'sublimelinter',
     'sublimelinter_executable_map',
