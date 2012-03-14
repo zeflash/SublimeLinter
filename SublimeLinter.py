@@ -20,6 +20,7 @@ TIMES = {}       # collects how long it took the linting to complete
 MOD_LOAD = Loader(os.getcwd(), LINTERS)  # utility to load (and reload
                  # if necessary) linter modules [useful when working on plugin]
 
+
 # For snappier linting, different delays are used for different linting times:
 # (linting time, delays)
 DELAYS = (
@@ -49,7 +50,10 @@ ALL_SETTINGS = [
     'sublimelinter_gutter_marks',
     'sublimelinter_wrap_find',
     'sublimelinter_popup_errors_on_save',
+    'javascript_linter',
     'jshint_options',
+    'gjslint_options',
+    'gjslint_ignore',
     'pep8_ignore',
     'pyflakes_ignore',
     'pyflakes_ignore_import_*',
@@ -158,11 +162,12 @@ def popup_error_list(view):
             column += offset
             offset += 1
             line_text = u'{0}^{1}'.format(line_text[0:column], line_text[column:])
-            index += 1
 
         for message in line_errors:
             item = [message, u'{0}: {1}'.format(line + 1, line_text.strip())]
             panel_items.append(item)
+
+        index += 1
 
     def on_done(selected_item):
         if selected_item == -1:
@@ -566,12 +571,25 @@ def reload_view_module(view):
             break
 
 
+def settings_changed():
+    for window in sublime.windows():
+        for view in window.views():
+            linter = select_linter(view)
+
+            if (linter):
+                reload_settings(view)
+
+
 def reload_settings(view):
     '''Restores user settings.'''
     settings = sublime.load_settings(__name__ + '.sublime-settings')
+    settings.clear_on_change(__name__)
+    settings.add_on_change(__name__, settings_changed)
+
     for setting in ALL_SETTINGS:
         if settings.get(setting) != None:
             view.settings().set(setting, settings.get(setting))
+
     if view.settings().get('sublimelinter') == None:
         view.settings().set('sublimelinter', True)
 
@@ -655,13 +673,18 @@ class BackgroundLinter(sublime_plugin.EventListener):
             erase_lint_marks(view)
             return
 
+        # Reset the last selected line number so that the current line will show error messages
+        # when update_statusbar is called.
+        self.lastSelectedLineNo = -1
         delay = get_delay(TIMES.get(view.id(), 100), view)
         queue_linter(linter, view, *delay)
 
     def on_load(self, view):
         reload_settings(view)
+
         if view.is_scratch() or view.settings().get('sublimelinter') == False:
             return
+
         background_run(select_linter(view), view, event='on_load')
 
     def on_post_save(self, view):
