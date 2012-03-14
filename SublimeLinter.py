@@ -85,7 +85,7 @@ def update_statusbar(view):
     lineno = last_selected_lineno(view)
     errors = []
 
-    if lineno:
+    if lineno is not None:
         if vid in ERRORS and lineno in ERRORS[vid]:
             errors.extend(ERRORS[vid][lineno])
 
