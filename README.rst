@@ -213,9 +213,9 @@ to your theme (adapting the color to your liking)::
     </dict>
     <dict>
         <key>name</key>
-        <string>SublimeLinter Outline</string>
+        <string>SublimeLinter Error Outline</string>
         <key>scope</key>
-        <string>sublimelinter.illegal</string>
+        <string>sublimelinter.outline.illegal</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -226,9 +226,9 @@ to your theme (adapting the color to your liking)::
     </dict>
     <dict>
         <key>name</key>
-        <string>SublimeLinter Underline</string>
+        <string>SublimeLinter Error Underline</string>
         <key>scope</key>
-        <string>invalid.illegal</string>
+        <string>sublimelinter.underline.illegal</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -239,7 +239,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Warning Outline</string>
         <key>scope</key>
-        <string>sublimelinter.warning</string>
+        <string>sublimelinter.outline.warning</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -252,7 +252,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Warning Underline</string>
         <key>scope</key>
-        <string>invalid.warning</string>
+        <string>sublimelinter.underline.warning</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -263,7 +263,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Violation Outline</string>
         <key>scope</key>
-        <string>sublimelinter.violation</string>
+        <string>sublimelinter.outline.violation</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -276,7 +276,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Violation Underline</string>
         <key>scope</key>
-        <string>invalid.violation</string>
+        <string>sublimelinter.underline.violation</string>
         <key>settings</key>
         <dict>
             <key>background</key>

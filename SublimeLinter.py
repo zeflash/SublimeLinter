@@ -204,7 +204,7 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
 
     for type_name, underlines in types.items():
         if underlines:
-            view.add_regions('lint-underline-' + type_name, underlines, 'invalid.' + type_name, sublime.DRAW_EMPTY_AS_OVERWRITE)
+            view.add_regions('lint-underline-' + type_name, underlines, 'sublimelinter.underline.' + type_name, sublime.DRAW_EMPTY_AS_OVERWRITE)
 
     if lines:
         fill_outlines = view.settings().get('sublimelinter_fill_outlines', False)
@@ -226,7 +226,7 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
                 args = [
                     'lint-outlines-{0}'.format(lint_type),
                     outlines[lint_type],
-                    'sublimelinter.{0}'.format(lint_type),
+                    'sublimelinter.outline.{0}'.format(lint_type),
                     MARKS[lint_type][gutter_mark_enabled]
                 ]
                 if not fill_outlines:
