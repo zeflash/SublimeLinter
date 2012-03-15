@@ -24,7 +24,7 @@ class Linter(BaseLinter):
     def get_executable(self, view):
         self.linter = view.settings().get('javascript_linter', 'jshint')
 
-        if (self.linter == 'jshint'):
+        if (self.linter in ('jshint', 'jslint')):
             foundEngine, path, message = self.get_javascript_engine(view)
             self.use_jsc = path == self.jsc_path()
             self.js_engine = os.path.join(self.js_engine_path(), 'jsc.js' if self.use_jsc else 'node.js')
@@ -47,21 +47,18 @@ class Linter(BaseLinter):
             args.extend(gjslint_options)
             args.extend(['--nobeep', filename])
             return args
-        elif (self.linter == 'jshint'):
-            path = self.jshint_path()
-            jshint_options = json.dumps(view.settings().get("jshint_options") or {})
+        elif (self.linter in ('jshint', 'jslint')):
+            path = os.path.join(os.path.dirname(__file__), 'libs', self.linter)
+            options = json.dumps(view.settings().get('%s_options' % self.linter) or {})
 
             if self.use_jsc:
-                args = (self.js_engine, '--', path + os.path.sep, str(code.count('\n')), jshint_options)
+                args = (self.js_engine, '--', path + os.path.sep, str(code.count('\n')), options)
             else:
-                args = (self.js_engine, path + os.path.sep, jshint_options)
+                args = (self.js_engine, path + os.path.sep, options)
 
             return args
         else:
             return []
-
-    def jshint_path(self):
-        return os.path.join(os.path.dirname(__file__), 'libs', 'jshint')
 
     def parse_errors(self, view, errors, lines, errorUnderlines, violationUnderlines, warningUnderlines, errorMessages, violationMessages, warningMessages):
         if (self.linter == 'gjslint'):
@@ -76,7 +73,7 @@ class Linter(BaseLinter):
                     if (int(errnum) not in ignore):
                         self.add_message(int(line), lines, message, errorMessages)
 
-        elif (self.linter == 'jshint'):
+        elif (self.linter in ('jshint', 'jslint')):
             errors = json.loads(errors.strip() or '[]')
 
             for error in errors:
