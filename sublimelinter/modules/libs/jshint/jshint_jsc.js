@@ -18,7 +18,7 @@ if (typeof(JSHINT) === 'undefined') {
 
 var process = function (args) {
     var lineCount = parseInt(args[0], 10),
-        opts  = (function (arg) {
+        opts = (function (arg) {
             switch (arg) {
             case undefined:
             case '':

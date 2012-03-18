@@ -8,7 +8,7 @@ can be quickly located.
 
 SublimeLinter has built in linters for the following languages:
 
-* Javascript - lint via built in `jshint <http://jshint.org>`_
+* Javascript - lint via built in `jshint <http://jshint.org>`_ or the `closure linter (gjslint) <https://developers.google.com/closure/utilities/docs/linter_howto>`_ (if installed)
 * Objective-J - lint via built-in `capp_lint <https://github.com/aparajita/capp_lint>`_
 * python - native, moderately-complete lint
 * ruby - syntax checking via "ruby -wc"
@@ -95,9 +95,11 @@ Linter-specific notes
 ~~~~~~~~~~~~~~~~~~~~~
 Following are notes specific to individual linters that you should be aware of:
 
-* **JavaScript** – This linter runs `jshint <http://jshint.org>`_ using JavaScriptCore on Mac OS X or node.js on other platforms, which can be downloaded from [the node.js site](http://nodejs.org/#download). After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings.
+* **JavaScript** – If the "javascript_linter" setting is "jshint", this linter runs `jshint <http://jshint.org>`_ using JavaScriptCore on Mac OS X or node.js on other platforms, which can be downloaded from `the node.js site <http://nodejs.org/#download>`. After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings.
 
-    You may want to modify the options passed to jshint. This can be done globally or on a per-project basis by using the **jshint_options** setting. Refer to the jshint.org site for more information on the configuration options available.
+  If the "javascript_linter" setting is "gjslint", this linter runs the `closure linter (gjslint) <https://developers.google.com/closure/utilities/docs/linter_howto>`_. After installation, if gjslint cannot be found by SublimeLinter, you may have to set the path to gjslint in the "sublimelinter\_executable\_map" setting.
+
+  You may want to modify the options passed to jshint or gjslint. This can be done globally or on a per-project basis by using the **jshint_options** or **gjslint_options** setting. Refer to the jshint.org site or run ``gjslint --help`` for more information on the configuration options available.
 
 * **ruby** – If you are using rvm or rbenv, you will probably have to specify the full path to the ruby you are using in the ``sublimelinter_executable_map`` setting. See "Configuring" below for more info.
 
@@ -106,6 +108,8 @@ Following are notes specific to individual linters that you should be aware of:
 Configuring
 -----------
 There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``. To change the options in your user settings, select the menu item ``Preferences->File Settings - User``.
+
+**NOTE:** Any settings you specify in your user settings will **completely** replace the setting in the default file.
 
 Per-project settings
 ~~~~~~~~~~~~~~~~~~~~
@@ -209,9 +213,9 @@ to your theme (adapting the color to your liking)::
     </dict>
     <dict>
         <key>name</key>
-        <string>SublimeLinter Outline</string>
+        <string>SublimeLinter Error Outline</string>
         <key>scope</key>
-        <string>sublimelinter.illegal</string>
+        <string>sublimelinter.outline.illegal</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -222,9 +226,9 @@ to your theme (adapting the color to your liking)::
     </dict>
     <dict>
         <key>name</key>
-        <string>SublimeLinter Underline</string>
+        <string>SublimeLinter Error Underline</string>
         <key>scope</key>
-        <string>invalid.illegal</string>
+        <string>sublimelinter.underline.illegal</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -235,7 +239,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Warning Outline</string>
         <key>scope</key>
-        <string>sublimelinter.warning</string>
+        <string>sublimelinter.outline.warning</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -248,7 +252,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Warning Underline</string>
         <key>scope</key>
-        <string>invalid.warning</string>
+        <string>sublimelinter.underline.warning</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -259,7 +263,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Violation Outline</string>
         <key>scope</key>
-        <string>sublimelinter.violation</string>
+        <string>sublimelinter.outline.violation</string>
         <key>settings</key>
         <dict>
             <key>background</key>
@@ -272,7 +276,7 @@ to your theme (adapting the color to your liking)::
         <key>name</key>
         <string>SublimeLinter Violation Underline</string>
         <key>scope</key>
-        <string>invalid.violation</string>
+        <string>sublimelinter.underline.violation</string>
         <key>settings</key>
         <dict>
             <key>background</key>
