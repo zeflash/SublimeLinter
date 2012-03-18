@@ -167,20 +167,29 @@ For example, let's say we are editing a Java project and want to use the "java" 
 
 Customizing colors
 ~~~~~~~~~~~~~~~~~~
-There are three types of "errors" flagged by sublime lint: illegal,
+**IMPORTANT** - The theme style names have recently changed. The old and new color
+names are:
+
+Old                     New
+---------------------   -----------------------------
+sublimelinter.<type>    sublimelinter.outline.<type>
+invalid.<type>          sublimelinter.underline.<type>
+
+Please change the names in your color themes accordingly.
+
+There are three types of "errors" flagged by SublimeLinter: illegal,
 violation, and warning. For each type, SublimeLinter will indicate the offending
 line and the character position at which the error occurred on the line.
 
 By default SublimeLinter will outline offending lines using the background color
-of the "sublimelinter.<type>" theme style, and underline the character position
-using the background color of the "invalid.<type>" theme style, where <type>
+of the "sublimelinter.outline.<type>" theme style, and underline the character position
+using the background color of the "sublimelinter.underline.<type>" theme style, where <type>
 is one of the three error types.
 
 If these styles are not defined, the color will be black when there is a light
 background color and black when there is a dark background color. You may
-define a single "sublimelinter" or "invalid" style to color all three types,
+define a single "sublimelinter.outline" or "sublimelinter.underline" style to color all three types,
 or define separate substyles for one or more types to color them differently.
-Most themes have an "invalid" theme style defined by default.
 
 If you want to make the offending lines glaringly obvious (perhaps for those
 who tend to ignore lint errors), you can set the user setting::
@@ -188,7 +197,7 @@ who tend to ignore lint errors), you can set the user setting::
     "sublimelinter_fill_outlines": true
 
 When this is set true, lines that have errors will be colored with the background
-and foreground color of the "sublime.<type>" theme style. Unless you have defined
+and foreground color of the "sublime.outline.<type>" theme style. Unless you have defined
 those styles, this setting should be left false.
 
 You may also mark lines with errors by putting an "x" in the gutter with the user setting::
