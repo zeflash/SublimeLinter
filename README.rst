@@ -170,10 +170,10 @@ Customizing colors
 **IMPORTANT** - The theme style names have recently changed. The old and new color
 names are:
 
-Old                     New
----------------------   -----------------------------
-sublimelinter.<type>    sublimelinter.outline.<type>
-invalid.<type>          sublimelinter.underline.<type>
+    Old                     New
+    ---------------------   -----------------------------
+    sublimelinter.<type>    sublimelinter.outline.<type>
+    invalid.<type>          sublimelinter.underline.<type>
 
 Please change the names in your color themes accordingly.
 
