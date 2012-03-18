@@ -168,7 +168,7 @@ For example, let's say we are editing a Java project and want to use the "java" 
 Customizing colors
 ~~~~~~~~~~~~~~~~~~
 **IMPORTANT** - The theme style names have recently changed. The old and new color
-names are:
+names are::
 
     Old                     New
     ---------------------   -----------------------------
