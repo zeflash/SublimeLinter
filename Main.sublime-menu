@@ -17,6 +17,12 @@
                         [
                             {
                                 "command": "open_file",
+                                "args": {"file": "${packages}/SublimeLinter/README.rst"},
+                                "caption": "README"
+                            },
+                            { "caption": "-" },
+                            {
+                                "command": "open_file",
                                 "args": {"file": "${packages}/SublimeLinter/SublimeLinter.sublime-settings"},
                                 "caption": "Settings – Default"
                             },

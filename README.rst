@@ -16,10 +16,6 @@ SublimeLinter has built in linters for the following languages:
 * java - lint via "javac -Xlint"
 * perl - syntax+deprecation checking via "perl -c"
 
-.. image:: http://pledgie.com/campaigns/16512.png?skin_name=chrome
-   :alt: Click here to lend your support to SublimeLinter and make a donation at pledgie.com!
-   :target: http://pledgie.com/campaigns/16512
-
 
 Installing
 ----------
@@ -168,12 +164,12 @@ For example, let's say we are editing a Java project and want to use the "java" 
 Customizing colors
 ~~~~~~~~~~~~~~~~~~
 **IMPORTANT** - The theme style names have recently changed. The old and new color
-names are:
+names are::
 
-Old                     New
----------------------   -----------------------------
-sublimelinter.<type>    sublimelinter.outline.<type>
-invalid.<type>          sublimelinter.underline.<type>
+    Old                     New
+    ---------------------   -----------------------------
+    sublimelinter.<type>    sublimelinter.outline.<type>
+    invalid.<type>          sublimelinter.underline.<type>
 
 Please change the names in your color themes accordingly.
 
