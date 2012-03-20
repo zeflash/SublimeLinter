@@ -34,7 +34,7 @@ function lint(code, config)
             ruleset[ruleName] = 2;
         }
     }
-    
+
     var report = _csslint.CSSLint.verify(code, ruleset);
 
     report.messages.forEach(function (message) {
@@ -44,9 +44,9 @@ function lint(code, config)
             // message.line
             // message.col
             // message.message
-            // message.evidence // Requires sanitizing as it can include CR, LF 
-            // message.rule // The rule object 
-            
+            // message.evidence // Requires sanitizing as it can include CR, LF
+            // message.rule // The rule object
+
             // We don't pass on the rollup messages
             if (message.rollup !== true) {
                 results.push({
