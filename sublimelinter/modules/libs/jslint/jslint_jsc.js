@@ -1,5 +1,5 @@
 /*jshint boss: true, evil: true */
-/*globals load quit readline JSHINT */
+/*globals load quit readline JSLINT */
 
 // usage:
 //   jsc ${envHome}/jsc.js -- ${lineCount} {option1:true,option2:false} ${envHome}
