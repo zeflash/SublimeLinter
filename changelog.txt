@@ -109,3 +109,10 @@ SublimeLinter 1.5.5 changelog
 CHANGES/FIXES
 
 - This change log is available from the SublimeLinter preferences menu.
+
+
+SublimeLinter 1.5.6 changelog
+=============================
+CHANGES/FIXES
+
+- Fixed a problem with messages.json that prevented correct upgrading.
