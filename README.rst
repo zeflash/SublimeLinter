@@ -105,7 +105,7 @@ Following are notes specific to individual linters that you should be aware of:
 
 Configuring
 -----------
-There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``. To change the options in your user settings, select the menu item ``Preferences->File Settings - User``.
+There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``. To change the options in your user settings, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``.
 
 **NOTE:** Any settings you specify in your user settings will **completely** replace the setting in the default file.
 
