@@ -14,7 +14,6 @@ CONFIG = {
 
 
 class Linter(BaseLinter):
-    JSC_PATH = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
     GJSLINT_RE = re.compile(r'Line (?P<line>\d+),\s*E:(?P<errnum>\d+):\s*(?P<message>.+)')
 
     def __init__(self, config):
@@ -26,9 +25,9 @@ class Linter(BaseLinter):
         self.linter = view.settings().get('javascript_linter', 'jshint')
 
         if (self.linter == 'jshint'):
-            if os.path.exists(self.JSC_PATH):
+            if os.path.exists(self.jsc_path()):
                 self.use_jsc = True
-                return (True, self.JSC_PATH, 'using JavaScriptCore')
+                return (True, self.jsc_path(), 'using JavaScriptCore')
             try:
                 path = self.get_mapped_executable(view, 'node')
                 subprocess.call([path, '-v'], startupinfo=self.get_startupinfo())

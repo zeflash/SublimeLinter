@@ -69,6 +69,8 @@ TEMPFILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 if not os.path.exists(TEMPFILES_DIR):
     os.mkdir(TEMPFILES_DIR)
 
+JSC_PATH = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
+
 
 class BaseLinter(object):
     '''A base class for linters. Your linter module needs to do the following:
@@ -296,3 +298,8 @@ class BaseLinter(object):
             return subprocess.Popen(args, self.get_startupinfo()).communicate()[0]
         except:
             return ''
+
+    def jsc_path(self):
+        '''Return the path to JavaScriptCore. Use this method in case the path
+           has to be dynamically calculated in the future.'''
+        return JSC_PATH
