@@ -303,3 +303,13 @@ class BaseLinter(object):
         '''Return the path to JavaScriptCore. Use this method in case the path
            has to be dynamically calculated in the future.'''
         return JSC_PATH
+
+    def get_javascript_engine(self, view):
+        if os.path.exists(self.jsc_path()):
+            return (True, self.jsc_path(), 'using JavaScriptCore')
+        try:
+            path = self.get_mapped_executable(view, 'node')
+            subprocess.call([path, '-v'], startupinfo=self.get_startupinfo())
+            return (True, path, '')
+        except OSError:
+            return (False, '', 'JavaScriptCore or node.js is required')
