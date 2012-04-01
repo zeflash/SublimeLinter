@@ -27,6 +27,7 @@ class Linter(BaseLinter):
         if (self.linter == 'jshint'):
             foundEngine, path, message = self.get_javascript_engine(view)
             self.use_jsc = path == self.jsc_path()
+            self.js_engine = os.path.join(self.js_engine_path(), 'jsc.js' if self.use_jsc else 'node.js')
             return (foundEngine, path, message)
         elif (self.linter == 'gjslint'):
             try:
@@ -51,9 +52,9 @@ class Linter(BaseLinter):
             jshint_options = json.dumps(view.settings().get("jshint_options") or {})
 
             if self.use_jsc:
-                args = (os.path.join(path, 'jshint_jsc.js'), '--', str(code.count('\n')), jshint_options, path + os.path.sep)
+                args = (self.js_engine, '--', path + os.path.sep, str(code.count('\n')), jshint_options)
             else:
-                args = (os.path.join(path, 'jshint_node.js'), jshint_options)
+                args = (self.js_engine, path + os.path.sep, jshint_options)
 
             return args
         else:
