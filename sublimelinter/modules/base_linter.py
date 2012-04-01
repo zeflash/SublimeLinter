@@ -69,6 +69,9 @@ TEMPFILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 if not os.path.exists(TEMPFILES_DIR):
     os.mkdir(TEMPFILES_DIR)
 
+JSC_PATH = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
+JS_ENGINES_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs', 'jsengines'))
+
 
 class BaseLinter(object):
     '''A base class for linters. Your linter module needs to do the following:
@@ -306,6 +309,10 @@ class BaseLinter(object):
         '''Return the path to JavaScriptCore. Use this method in case the path
            has to be dynamically calculated in the future.'''
         return self.JSC_PATH
+
+    def js_engine_path(self):
+        '''Return the path to the Javascript engine wrappers.'''
+        return JS_ENGINES_PATH
 
     def get_javascript_engine(self, view):
         for engine in self.JAVASCRIPT_ENGINES:
