@@ -9,12 +9,12 @@ exports.lint = function (code, config) {
     var ruleset = {};
 
     // rules that are `false` will be ignored.
-    for (var ruleName in config['rules']) {
+    for (var ruleName in config) {
 
-        if (config['rules'][ruleName] === 'warning') {
+        if (config[ruleName] === 'warning') {
             ruleset[ruleName] = 1;
         // Rules set to `true` or 'error' will be considered errors
-        } else if (config['rules'][ruleName]) {
+        } else if (config[ruleName]) {
             ruleset[ruleName] = 2;
         }
 

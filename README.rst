@@ -8,7 +8,8 @@ can be quickly located.
 
 SublimeLinter has built in linters for the following languages:
 
-* Javascript - lint via built in `jshint <http://jshint.org>`_ or the `closure linter (gjslint) <https://developers.google.com/closure/utilities/docs/linter_howto>`_ (if installed)
+* Javascript - lint via built in `jshint <http://jshint.org>`_, `jslint <http://jslint.com>`_, or the `closure linter (gjslint) <https://developers.google.com/closure/utilities/docs/linter_howto>`_ (if installed)
+* CSS - lint via built-in `csslint <http://csslint.net>`_
 * Objective-J - lint via built-in `capp_lint <https://github.com/aparajita/capp_lint>`_
 * python - native, moderately-complete lint
 * ruby - syntax checking via "ruby -wc"
@@ -93,11 +94,15 @@ Linter-specific notes
 ~~~~~~~~~~~~~~~~~~~~~
 Following are notes specific to individual linters that you should be aware of:
 
-* **JavaScript** - If the "javascript_linter" setting is "jshint", this linter runs `jshint <http://jshint.org>`_ using JavaScriptCore on Mac OS X or node.js on other platforms, which can be downloaded from `the node.js site <http://nodejs.org/#download>`. After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings.
+* **JavaScript** - If the "javascript_linter" setting is "jshint" or "jslint", this linter runs `jshint <http://jshint.org>`_ (or `jslint <http://jslint.com>`_ respectively) using node.js, which can be downloaded from `the node.js site <http://nodejs.org/#download>`. After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings. If node.js is not installed on Mac OS X, JavaScriptCore will be used.
 
   If the "javascript_linter" setting is "gjslint", this linter runs the `closure linter (gjslint) <https://developers.google.com/closure/utilities/docs/linter_howto>`_. After installation, if gjslint cannot be found by SublimeLinter, you may have to set the path to gjslint in the "sublimelinter\_executable\_map" setting.
 
   You may want to modify the options passed to jshint or gjslint. This can be done globally or on a per-project basis by using the **jshint_options** or **gjslint_options** setting. Refer to the jshint.org site or run ``gjslint --help`` for more information on the configuration options available.
+
+* **CSS** - This linter runs `csslint <http://csslint.net>`_ similarly to "jshint" or "jslint" in the Javascript notes above.
+
+  You may modify the linting options via the **csslint_options** setting. Each option may also be set to "warning" to display them as warnings instead of errors. Refer to csslint.net for available options.
 
 * **ruby** - If you are using rvm or rbenv, you will probably have to specify the full path to the ruby you are using in the ``sublimelinter_executable_map`` setting. See "Configuring" below for more info.
 
