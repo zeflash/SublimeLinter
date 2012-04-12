@@ -2,15 +2,9 @@
 /*globals LINTER_PATH load */
 
 // Make JSHINT a Node module, if possible.
-if (typeof exports === 'object' && exports) {
-    exports.lint = lint;
-    var JSHINT = require("./jshint").JSHINT;
-// Otherwise load via JSC
-} else {
-    load(LINTER_PATH + "jshint.js");
-}
+var JSHINT = require("./jshint").JSHINT;
 
-function lint(code, config) {
+exports.lint = function (code, config) {
     var results = [];
 
     try {
@@ -26,4 +20,4 @@ function lint(code, config) {
     }
 
     return results;
-}
+};
