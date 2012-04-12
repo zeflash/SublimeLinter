@@ -3,7 +3,6 @@
 
 import os
 import json
-import subprocess
 
 from base_linter import BaseLinter
 
@@ -13,34 +12,24 @@ CONFIG = {
 
 
 class Linter(BaseLinter):
-    JSC_PATH = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
-
     def __init__(self, config):
         super(Linter, self).__init__(config)
         self.use_jsc = False
 
     def get_executable(self, view):
-        if os.path.exists(self.JSC_PATH):
-            self.use_jsc = True
-            return (True, self.JSC_PATH, 'using JavaScriptCore')
-        try:
-            path = self.get_mapped_executable(view, 'node')
-            subprocess.call([path, '-v'], startupinfo=self.get_startupinfo())
-            return (True, path, '')
-        except OSError:
-            return (False, '', 'JavaScriptCore or node.js is required')
+        foundEngine, path, message = self.get_javascript_engine(view)
+        self.use_jsc = path == self.jsc_path()
+        self.js_engine = os.path.join(self.js_engine_path(), 'jsc.js' if self.use_jsc else 'node.js')
+        return (foundEngine, path, message)
 
     def get_lint_args(self, view, code, filename):
         path = self.csslint_path()
-        csslint_options = json.dumps(view.settings().get("csslint_options") or {})
+        options = json.dumps(view.settings().get("csslint_options") or {})
 
-        # if self.use_jsc:
-        #     args = (os.path.join(path, 'csslint_via_jsc.js'), '--', str(code.count('\n')), csslint_options, path + os.path.sep)
-        # else:
-        #     args = (os.path.join(path, 'csslint_via_node.js'), csslint_options)
-
-        # I cannot test JSC so I am disabling it for the moment.
-        args = (os.path.join(path, 'csslint_via_node.js'), csslint_options)
+        if self.use_jsc:
+            args = (self.js_engine, '--', path + os.path.sep, str(code.count('\n')), options)
+        else:
+            args = (self.js_engine, path + os.path.sep, options)
 
         return args
 
@@ -48,10 +37,17 @@ class Linter(BaseLinter):
         return os.path.join(os.path.dirname(__file__), 'libs', 'csslint')
 
     def parse_errors(self, view, errors, lines, errorUnderlines, violationUnderlines, warningUnderlines, errorMessages, violationMessages, warningMessages):
-        # print errors
         errors = json.loads(errors.strip() or '[]')
 
         for error in errors:
             lineno = error['line']
-            self.add_message(lineno, lines, error['reason'], errorMessages)
-            self.underline_range(view, lineno, error['character'] - 1, errorUnderlines)
+
+            if error['type'] == 'warning':
+                messages = warningMessages
+                underlines = warningUnderlines
+            else:
+                messages = errorMessages
+                underlines = errorUnderlines
+
+            self.add_message(lineno, lines, error['reason'], messages)
+            self.underline_range(view, lineno, error['character'] - 1, underlines)
