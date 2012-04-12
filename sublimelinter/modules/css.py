@@ -14,22 +14,18 @@ CONFIG = {
 class Linter(BaseLinter):
     def __init__(self, config):
         super(Linter, self).__init__(config)
-        self.use_jsc = False
 
     def get_executable(self, view):
-        foundEngine, path, message = self.get_javascript_engine(view)
-        self.use_jsc = path == self.jsc_path()
-        self.js_engine = os.path.join(self.js_engine_path(), 'jsc.js' if self.use_jsc else 'node.js')
-        return (foundEngine, path, message)
+        return self.get_javascript_engine(view)
 
     def get_lint_args(self, view, code, filename):
         path = self.csslint_path()
         options = json.dumps(view.settings().get("csslint_options") or {})
 
-        if self.use_jsc:
-            args = (self.js_engine, '--', path + os.path.sep, str(code.count('\n')), options)
+        if (self.javascript_engine(view) == 'jsc'):
+            args = (self.javascript_engine_wrapper(), '--', path + os.path.sep, str(code.count('\n')), options)
         else:
-            args = (self.js_engine, path + os.path.sep, options)
+            args = (self.javascript_engine_wrapper(), path + os.path.sep, options)
 
         return args
 

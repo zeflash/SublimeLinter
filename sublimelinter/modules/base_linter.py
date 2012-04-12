@@ -69,9 +69,6 @@ TEMPFILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 if not os.path.exists(TEMPFILES_DIR):
     os.mkdir(TEMPFILES_DIR)
 
-JSC_PATH = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
-JS_ENGINES_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs', 'jsengines'))
-
 
 class BaseLinter(object):
     '''A base class for linters. Your linter module needs to do the following:
@@ -89,6 +86,7 @@ class BaseLinter(object):
 
     JAVASCRIPT_ENGINES = ['node', 'jsc']
     JAVASCRIPT_ENGINE_NAMES = {'node': 'node.js', 'jsc': 'JavaScriptCore'}
+    JAVASCRIPT_ENGINE_WRAPPERS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs', 'jsengines'))
 
     def __init__(self, config):
         self.language = config['language']
@@ -305,14 +303,25 @@ class BaseLinter(object):
         except:
             return ''
 
+    def javascript_engine(self, view):
+        '''Return the javascript engine; this is meanted to be used for
+           quick decision making rather than `get_javascript_engine` which
+           actually checks the system to determine which engine to use.'''
+
+        # If `self.js_engine` is not set, check the javascript engine
+        if self.js_engine == None:
+            self.get_javascript_engine(self, view)
+
+        return self.js_engine
+
     def jsc_path(self):
         '''Return the path to JavaScriptCore. Use this method in case the path
            has to be dynamically calculated in the future.'''
         return self.JSC_PATH
 
-    def js_engine_path(self):
-        '''Return the path to the Javascript engine wrappers.'''
-        return JS_ENGINES_PATH
+    def javascript_engine_wrapper(self):
+        '''Return the Javascript engine wrapper path.'''
+        return os.path.join(self.JAVASCRIPT_ENGINE_WRAPPERS_PATH, self.js_engine + '.js')
 
     def get_javascript_engine(self, view):
         for engine in self.JAVASCRIPT_ENGINES:
@@ -320,12 +329,14 @@ class BaseLinter(object):
                 try:
                     path = self.get_mapped_executable(view, 'node')
                     subprocess.call([path, '-v'], startupinfo=self.get_startupinfo())
-                    return (True, path, '')
+                    self.js_engine = engine
+                    return (True, path, 'using {0}'.format(self.JAVASCRIPT_ENGINE_NAMES[engine]))
                 except OSError:
                     pass
 
             elif engine == 'jsc':
                 if os.path.exists(self.jsc_path()):
+                    self.js_engine = engine
                     return (True, self.jsc_path(), 'using {0}'.format(self.JAVASCRIPT_ENGINE_NAMES[engine]))
 
         # Didn't find an engine, tell the user
