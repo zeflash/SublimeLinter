@@ -1,0 +1,7 @@
+SublimeLinter 1.6.0 changelog
+
+CHANGES/FIXES
+
+- Simpler usage of Javascript engines for JS powered linters...
+
+-
