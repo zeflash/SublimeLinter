@@ -4,10 +4,18 @@
 // usage:
 //   jsc ${envHome}/jsc.js -- /path/to/linter/ ${lineCount} {option1:true,option2:false}
 
-var LINTER_PATH = arguments[0].replace(/\/$/, '') + '/';
-load(LINTER_PATH + 'linter.js');
+var USING_JSC = true,
+    LINTER_PATH = arguments[0].replace(/\/$/, '') + '/';
 
-if (typeof lint === 'undefined') {
+var require = function (file) {
+        load(LINTER_PATH + file.replace(/\.js$/, '') + '.js');
+        return this;
+    },
+    exports = {};
+
+require('linter');
+
+if (typeof exports.lint === 'undefined') {
     print('JSC: Could not load linter.js.');
     quit();
 }
@@ -34,7 +42,7 @@ var process = function (args) {
         code += '\n' + readline();
     }
 
-    var results = lint(code, opts);
+    var results = exports.lint(code, opts);
 
     print(JSON.stringify(results));
     quit();
