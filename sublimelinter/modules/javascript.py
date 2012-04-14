@@ -48,7 +48,6 @@ class Linter(BaseLinter):
             return []
 
     def parse_errors(self, view, errors, lines, errorUnderlines, violationUnderlines, warningUnderlines, errorMessages, violationMessages, warningMessages):
-        print errors
         if (self.linter == 'gjslint'):
             ignore = view.settings().get('gjslint_ignore', [])
 
