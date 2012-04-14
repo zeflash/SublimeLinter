@@ -29,9 +29,9 @@ NEW FEATURES
   to JSLint, see http://jslint.com/lint.html.
 
 - The CSSLint CSS linter (csslint) is now supported (http://csslint.net).
-  By default all CSSLint settings are turned on (and set as a warning).
-  You may customize csslint behavior with the "csslint_options" setting.
-  Please select "Preferences->Package Settings->SublimeLinter->Settings - Default"
+  By default all CSSLint settings are turned on. You may customize csslint
+  behavior with the "csslint_options" setting. Please select
+  "Preferences->Package Settings->SublimeLinter->Settings - Default"
   for more information on turning off or adjusting severity of tests.
   For more information about options available to CSSLint, see
   https://github.com/stubbornella/csslint/wiki/Rules.
