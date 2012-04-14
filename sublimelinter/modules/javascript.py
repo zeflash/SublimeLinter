@@ -46,11 +46,12 @@ class Linter(BaseLinter):
         elif (self.linter in ('jshint', 'jslint')):
             path = os.path.join(os.path.dirname(__file__), 'libs', self.linter)
             options = json.dumps(view.settings().get('%s_options' % self.linter) or {})
+            engine = self.js_engine
 
-            if (self.javascript_engine(view) == 'jsc'):
-                args = (self.javascript_engine_wrapper(), '--', path + os.path.sep, str(code.count('\n')), options)
+            if (engine['name'] == 'jsc'):
+                args = (engine['wrapper'], '--', path + os.path.sep, str(code.count('\n')), options)
             else:
-                args = (self.javascript_engine_wrapper(), path + os.path.sep, options)
+                args = (engine['wrapper'], path + os.path.sep, options)
 
             return args
         else:
