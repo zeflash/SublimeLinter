@@ -90,6 +90,14 @@ By default the search will wrap. You can turn wrapping off with the user setting
 
     "sublimelinter_wrap_find": false
 
+SublimeLinter Settings
+~~~~~~~~~~~~~~~~~~~~~~
+Do NOT edit the default SublimeLinter settings. Your changes will be lost
+when SublimeLinter is updated. ALWAYS edit the user SublimeLinter settings
+by selecting "Preferences->Package Settings->SublimeLinter->Settings - User".
+Note that individual settings you include in your user settings will **completely**
+replace the corresponding default setting, so you must provide that setting in its entirety.
+
 Linter-specific notes
 ~~~~~~~~~~~~~~~~~~~~~
 Following are notes specific to individual linters that you should be aware of:
@@ -111,9 +119,9 @@ Following are notes specific to individual linters that you should be aware of:
 
 Configuring
 -----------
-There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``. To change the options in your user settings, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``.
+There are a number of configuration options available to customize the behavior of SublimeLinter and its linters. For the latest information on what options are available, select the menu item ``Preferences->Package Settings->SublimeLinter->Settings - Default``.
 
-**NOTE:** Any settings you specify in your user settings will **completely** replace the setting in the default file.
+Do NOT edit the default SublimeLinter settings. Your changes will be lost when SublimeLinter is updated. ALWAYS edit the user SublimeLinter settings by selecting ``Preferences->Package Settings->SublimeLinter->Settings - User``. Note that individual settings you include in your user settings will **completely** replace the corresponding default setting, so you must provide that setting in its entirety.
 
 Per-project settings
 ~~~~~~~~~~~~~~~~~~~~
