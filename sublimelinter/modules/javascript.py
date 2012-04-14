@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # javascript.py - sublimelint package for checking Javascript files
 
-import os
 import json
 import re
 import subprocess
@@ -44,20 +43,12 @@ class Linter(BaseLinter):
             args.extend(['--nobeep', filename])
             return args
         elif (self.linter in ('jshint', 'jslint')):
-            path = os.path.join(os.path.dirname(__file__), 'libs', self.linter)
-            options = json.dumps(view.settings().get('%s_options' % self.linter) or {})
-            engine = self.js_engine
-
-            if (engine['name'] == 'jsc'):
-                args = (engine['wrapper'], '--', path + os.path.sep, str(code.count('\n')), options)
-            else:
-                args = (engine['wrapper'], path + os.path.sep, options)
-
-            return args
+            return self.get_javascript_args(view, self.linter, code)
         else:
             return []
 
     def parse_errors(self, view, errors, lines, errorUnderlines, violationUnderlines, warningUnderlines, errorMessages, violationMessages, warningMessages):
+        print errors
         if (self.linter == 'gjslint'):
             ignore = view.settings().get('gjslint_ignore', [])
 

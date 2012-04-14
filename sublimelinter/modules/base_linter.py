@@ -3,6 +3,7 @@
 
 import os
 import os.path
+import json
 import re
 import subprocess
 
@@ -84,17 +85,18 @@ class BaseLinter(object):
 
     JSC_PATH = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
 
+    LIB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs'))
+
     JAVASCRIPT_ENGINES = ['node', 'jsc']
     JAVASCRIPT_ENGINE_NAMES = {'node': 'node.js', 'jsc': 'JavaScriptCore'}
-    JAVASCRIPT_ENGINE_WRAPPERS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs', 'jsengines'))
-
-    js_engine = None
+    JAVASCRIPT_ENGINE_WRAPPERS_PATH = os.path.join(LIB_PATH, 'jsengines')
 
     def __init__(self, config):
         self.language = config['language']
         self.enabled = False
         self.executable = config.get('executable', None)
         self.test_existence_args = config.get('test_existence_args', ('-v',))
+        self.js_engine = None
 
         if isinstance(self.test_existence_args, basestring):
             self.test_existence_args = (self.test_existence_args,)
@@ -309,6 +311,20 @@ class BaseLinter(object):
         '''Return the path to JavaScriptCore. Use this method in case the path
            has to be dynamically calculated in the future.'''
         return self.JSC_PATH
+
+    def get_javascript_args(self, view, linter, code):
+        path = os.path.join(self.LIB_PATH, linter)
+        options = json.dumps(view.settings().get('%s_options' % linter) or {})
+
+        self.get_javascript_engine(view)
+        engine = self.js_engine
+
+        if (engine['name'] == 'jsc'):
+            args = (engine['wrapper'], '--', path + os.path.sep, str(code.count('\n')), options)
+        else:
+            args = (engine['wrapper'], path + os.path.sep, options)
+
+        return args
 
     def get_javascript_engine(self, view):
         if self.js_engine == None:
