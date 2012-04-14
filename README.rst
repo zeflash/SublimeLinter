@@ -98,11 +98,12 @@ Following are notes specific to individual linters that you should be aware of:
 
   If the "javascript_linter" setting is "gjslint", this linter runs the `closure linter (gjslint) <https://developers.google.com/closure/utilities/docs/linter_howto>`_. After installation, if gjslint cannot be found by SublimeLinter, you may have to set the path to gjslint in the "sublimelinter\_executable\_map" setting.
 
-  You may want to modify the options passed to jshint or gjslint. This can be done globally or on a per-project basis by using the **jshint_options** or **gjslint_options** setting. Refer to the jshint.org site or run ``gjslint --help`` for more information on the configuration options available.
+  You may want to modify the options passed to jshint, jslint, or gjslint. This can be done by using the **jshint_options**, **jslint_options**, or **gjslint_options** setting. Refer to the jshint.org site, the jslint.com site, or run ``gjslint --help`` for more information on the configuration options available.
 
-* **CSS** - This linter runs `csslint <http://csslint.net>`_ similarly to "jshint" or "jslint" in the Javascript notes above.
+* **CSS** - This linter runs `csslint <http://csslint.net>`_. This linter requires a Javascript engine (like Node.js) to be installed (see notes above for the JavaScript linters: "jshint" or "jslint").
 
-  You may modify the linting options via the **csslint_options** setting. Each option may also be set to "warning" to display them as warnings instead of errors. Refer to csslint.net for available options.
+  By default all CSSLint settings are turned on (and set as a warning). You may customize csslint behavior with the "csslint_options" setting. Please select "Preferences->Package Settings->SublimeLinter->Settings - Default" for more information on turning off or adjusting severity of tests. For more information about options available to CSSLint, see https://github.com/stubbornella/csslint/wiki/Rules.
+
 
 * **ruby** - If you are using rvm or rbenv, you will probably have to specify the full path to the ruby you are using in the ``sublimelinter_executable_map`` setting. See "Configuring" below for more info.
 
@@ -333,5 +334,14 @@ If you wish to create a new linter to support a new language, SublimeLinter make
 * If your linter uses built in code, override ``built_in_check()`` and return the errors found.
 
 * Override ``parse_errors()`` and process the errors. If your linter overrides ``built_in_check()``, ``parse_errors()`` will receive the result of that method. If your linter uses an external executable, ``parse_errors()`` receives the raw output of the executable, stripped of leading and trailing whitespace.
+
+* If you linter is powered via Javascript (eg. Node.js), there are few steps that will simplify the integration.
+
+  Create a folder matching your linter name in the ``SublimeLinter/sublimelinter/modules/lib`` directory. This folder should include the linting library JS file (eg. jshint.js, csslint-node.js) and a **linter.js** file. The **linter.js** file should ``require`` the actual linter library file and export a ``lint`` function. The ``lint`` function should return a list of errors back to the python language handler file (via the ``errors`` parameter to the ``parse_errors`` method).
+
+  Although **linter.js** should follow the Node.js api, the linter may also be run via JavaScriptCore on OS X if Node.js is not installed. In the case where JavaScriptCore is used, require + export are shimmed to keep things consistent. However, it is important not to assume that a full Node.js api is available. If you must know what JS engine you are using, you may check for `USING_JSC` to be set as `true` when JavaScriptCore is used.
+
+  For examples of using the JS engines, see **csslint**, **jslint**, and **jshint** in ``SublimeLinter/sublimelinter/modules/libs`` and the respective python code of **css.py** and **javascript.py** in ``SublimeLinter/sublimelinter/modules``.
+
 
 If your linter has more complex requirements, see the comments for CONFIG in base\_linter.py, and use the existing linters as guides.
