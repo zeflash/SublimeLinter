@@ -337,7 +337,7 @@ If you wish to create a new linter to support a new language, SublimeLinter make
 
 * If you linter is powered via Javascript (eg. Node.js), there are few steps that will simplify the integration.
 
-  Create a folder matching your linter name in the ``SublimeLinter/sublimelinter/modules/lib`` directory. This folder should include the linting library JS file (eg. jshint.js, csslint-node.js) and a **linter.js** file. The **linter.js** file should ``require`` the actual linter library file and export a ``lint`` function. The ``lint`` function should return a list of errors back to the python language handler file (via the ``errors`` parameter to the ``parse_errors`` method).
+  Create a folder matching your linter name in the ``SublimeLinter/sublimelinter/modules/lib`` directory. This folder should include the linting library JS file (eg. jshint.js, csslint-node.js) and a **linter.js** file. The **linter.js** file should ``require()`` the actual linter library file and export a ``lint()`` function. The ``lint()`` function should return a list of errors back to the python language handler file (via the ``errors`` parameter to the ``parse_errors()`` method).
 
   Although **linter.js** should follow the Node.js api, the linter may also be run via JavaScriptCore on OS X if Node.js is not installed. In the case where JavaScriptCore is used, require + export are shimmed to keep things consistent. However, it is important not to assume that a full Node.js api is available. If you must know what JS engine you are using, you may check for `USING_JSC` to be set as `true` when JavaScriptCore is used.
 
