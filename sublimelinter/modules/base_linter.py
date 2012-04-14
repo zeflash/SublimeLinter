@@ -324,6 +324,7 @@ class BaseLinter(object):
         else:
             args = (engine['wrapper'], path + os.path.sep, options)
 
+        print args
         return args
 
     def get_javascript_engine(self, view):
