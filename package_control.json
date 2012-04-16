@@ -6,7 +6,7 @@
 			"description": "Inline lint highlighting for the Sublime Text 2 editor",
 			"author": "Kronuz, Aparajita Fishman, Jake Swartwood",
 			"homepage": "http://github.com/Kronuz/SublimeLinter",
-			"last_modified": "2012-04-11 23:38:34",
+			"last_modified": "2012-04-14 19:55:15",
 			"platforms": {
 				"*": [
 					{
