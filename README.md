@@ -108,9 +108,9 @@ Following are notes specific to individual linters that you should be aware of:
 
 * **CSS** - This linter runs [csslint](http://csslint.net). This linter requires a Javascript engine (like Node.js) to be installed (see notes above for the JavaScript linters: "jshint" or "jslint").
 
-  By default all CSSLint settings are turned on. You may customize CSSLint behavior with the "csslint_options" setting. Please select "Preferences->Package Settings->SublimeLinter->Settings - Default" for more information on turning off or adjusting severity of tests. For more information about options available to CSSLint, see https://github.com/stubbornella/csslint/wiki/Rules.
+  By default all CSSLint settings are turned on. You may customize CSSLint behavior with the "csslint_options" setting. Please select `Preferences->Package Settings->SublimeLinter->Settings - Default` for more information on turning off or adjusting severity of tests. For more information about options available to CSSLint, see https://github.com/stubbornella/csslint/wiki/Rules.
 
-* **perl** - Due to a vulnerability (issue #77) with the Perl linter, Perl syntax checking is no longer enabled by default. The default linter for Perl has been replaced by Perl::Critic. The standard Perl syntax checker can still be invoked by switching the "perl_linter" setting to "perl".
+* **perl** - Due to a vulnerability (issue [#77](https://github.com/Kronuz/SublimeLinter/issues/77)) with the Perl linter, Perl syntax checking is no longer enabled by default. The default linter for Perl has been replaced by Perl::Critic. The standard Perl syntax checker can still be invoked by switching the "perl_linter" setting to "perl".
 
 * **ruby** - If you are using rvm or rbenv, you will probably have to specify the full path to the ruby you are using in the "sublimelinter_executable_map" setting. See "Configuring" below for more info.
 
