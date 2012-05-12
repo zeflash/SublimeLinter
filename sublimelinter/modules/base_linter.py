@@ -67,22 +67,11 @@ CONFIG = {
 
 TEMPFILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.tempfiles'))
 
+JSON_MULTILINE_COMMENT_RE = re.compile(r'\/\*[\s\S]*?\*\/')
+JSON_SINGLELINE_COMMENT_RE = re.compile(r'\/\/[^\n\r]*')
+
 if not os.path.exists(TEMPFILES_DIR):
     os.mkdir(TEMPFILES_DIR)
-
-
-def search_ancestor_file(name, dirname):
-    # check name exists on file system
-    filename = os.path.join(dirname, name)
-    if os.path.isfile(filename):
-        # if it does return it
-        return filename
-    parentDir = os.path.dirname(dirname)
-    parentFile = os.path.join(parentDir, name)
-    if filename == parentFile:
-        return None
-    # resursively call parent
-    return search_ancestor_file(name, parentDir)
 
 
 class BaseLinter(object):
@@ -335,14 +324,44 @@ class BaseLinter(object):
            has to be dynamically calculated in the future.'''
         return self.JSC_PATH
 
+    def search_ancestor_file(self, name, view):
+        path = view.file_name()
+
+        # quit if the view is temporary
+        if not path:
+            return None
+
+        while True:
+            path = os.path.dirname(path)
+            filename = os.path.join(path, name)
+
+            # if the file exists, read it and return the contents
+            if os.path.isfile(filename):
+                with open(filename, 'r') as f:
+                    return f.read()
+
+            # if we hit root, quit
+            if path == os.path.dirname(path):
+                return None
+
+    def strip_json_comments(self, json_str):
+        stripped_json = JSON_MULTILINE_COMMENT_RE.sub('', json_str)
+        stripped_json = JSON_SINGLELINE_COMMENT_RE.sub('', stripped_json)
+
+        cleaned_json = json.dumps(json.loads(stripped_json))
+
+        return cleaned_json
+
     def get_javascript_args(self, view, linter, code):
         path = os.path.join(self.LIB_PATH, linter)
         options = None
-        if linter == 'jshint' and view.file_name():
-            rcfile = search_ancestor_file('.jshintrc', os.path.dirname(view.file_name()))
-            if rcfile:
-                with open(rcfile, 'r') as f:
-                    options = f.read()
+
+        if linter == 'jshint':
+            rc_options = self.search_ancestor_file('.jshintrc', view)
+
+            if rc_options != None:
+                rc_options = self.strip_json_comments(rc_options)
+                options = json.dumps(json.loads(rc_options))
 
         if options == None:
             options = json.dumps(view.settings().get('%s_options' % linter) or {})
