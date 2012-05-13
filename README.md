@@ -8,15 +8,15 @@ can be quickly located.
 
 SublimeLinter has built in linters for the following languages:
 
-* CoffeeScript - lint via `coffee.cmd -l`
+* CoffeeScript - lint via `coffee -s -l`
 * CSS - lint via built-in [csslint](http://csslint.net)
-* java - lint via `javac -Xlint`
+* Java - lint via `javac -Xlint`
 * Javascript - lint via built in [jshint](http://jshint.org), [jslint](http://jslint.com), or the [closure linter (gjslint)](https://developers.google.com/closure/utilities/docs/linter_howto) (if installed)
 * Objective-J - lint via built-in [capp_lint](https://github.com/aparajita/capp_lint)
-* perl - lint via [Perl:Critic](http://perlcritic.com/) or syntax+deprecation checking via `perl -c`
-* php - syntax checking via `php -l`
-* python - native, moderately-complete lint
-* ruby - syntax checking via `ruby -wc`
+* Perl - lint via [Perl:Critic](http://perlcritic.com/) or syntax+deprecation checking via `perl -c`
+* PHP - syntax checking via `php -l`
+* Python - native, moderately-complete lint
+* Ruby - syntax checking via `ruby -wc`
 
 
 Installing
@@ -105,6 +105,8 @@ Following are notes specific to individual linters that you should be aware of:
   If the "javascript_linter" setting is "gjslint", this linter runs the [closure linter (gjslint)](https://developers.google.com/closure/utilities/docs/linter_howto). After installation, if gjslint cannot be found by SublimeLinter, you may have to set the path to gjslint in the "sublimelinter\_executable\_map" setting.
 
   You may want to modify the options passed to jshint, jslint, or gjslint. This can be done by using the **jshint_options**, **jslint_options**, or **gjslint_options** setting. Refer to the jshint.org site, the jslint.com site, or run `gjslint --help` for more information on the configuration options available.
+
+  SublimeLinter supports `.jshintrc` files. If using JSHint, SublimeLinter will recursively search the directory tree (from the file location to the file-system root directory). This functionality is specified in the [JSHint README](https://github.com/jshint/node-jshint/#within-your-projects-directory-tree).
 
 * **CSS** - This linter runs [csslint](http://csslint.net). This linter requires a Javascript engine (like Node.js) to be installed (see notes above for the JavaScript linters: "jshint" or "jslint").
 
