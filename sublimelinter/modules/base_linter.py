@@ -324,44 +324,40 @@ class BaseLinter(object):
            has to be dynamically calculated in the future.'''
         return self.JSC_PATH
 
-    def search_ancestor_file(self, name, view):
+    def find_file(self, filename, view):
+        '''Find a file with the given name, starting in the view's directory,
+           then ascending the file hierarchy up to root.'''
         path = view.file_name()
 
         # quit if the view is temporary
         if not path:
             return None
 
-        while True:
-            path = os.path.dirname(path)
-            filename = os.path.join(path, name)
+        dirname = os.path.dirname(path)
 
-            # if the file exists, read it and return the contents
-            if os.path.isfile(filename):
-                with open(filename, 'r') as f:
+        while True:
+            path = os.path.join(dirname, filename)
+
+            if os.path.isfile(path):
+                with open(path, 'r') as f:
                     return f.read()
 
             # if we hit root, quit
-            if path == os.path.dirname(path):
+            parent = os.path.dirname(dirname)
+
+            if parent == dirname:
                 return None
+            else:
+                dirname = parent
 
     def strip_json_comments(self, json_str):
         stripped_json = JSON_MULTILINE_COMMENT_RE.sub('', json_str)
         stripped_json = JSON_SINGLELINE_COMMENT_RE.sub('', stripped_json)
-
-        cleaned_json = json.dumps(json.loads(stripped_json))
-
-        return cleaned_json
+        return json.dumps(json.loads(stripped_json))
 
     def get_javascript_args(self, view, linter, code):
         path = os.path.join(self.LIB_PATH, linter)
-        options = None
-
-        if linter == 'jshint':
-            rc_options = self.search_ancestor_file('.jshintrc', view)
-
-            if rc_options != None:
-                rc_options = self.strip_json_comments(rc_options)
-                options = json.dumps(json.loads(rc_options))
+        options = self.get_javascript_options(view)
 
         if options == None:
             options = json.dumps(view.settings().get('%s_options' % linter) or {})
@@ -375,6 +371,12 @@ class BaseLinter(object):
             args = (engine['wrapper'], path + os.path.sep, options)
 
         return args
+
+    def get_javascript_options(self, view):
+        '''Subclasses should override this if they want to provide options
+           for a Javascript-based linter. If the subclass cannot provide
+           options, it should return None (or not return anything).'''
+        return None
 
     def get_javascript_engine(self, view):
         if self.js_engine == None:
