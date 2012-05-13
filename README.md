@@ -59,10 +59,10 @@ Within a file whose language/syntax is supported by SublimeLinter, you can contr
 
 * **SublimeLinter: Lint Current File** - Lints the current file, highlights any errors and displays how many errors were found.
 * **SublimeLinter: Show Error List** - Lints the current file, highlights any errors and displays a quick panel with any errors that are found. Selecting an item from the quick panel jumps to that line.
-* **SublimeLinter: Enable Background Linting** - Enables background linting mode for the current view and lints it.
-* **SublimeLinter: Disable Background Linting** - Disables background linting mode for the current view and clears all lint errors.
-* **SublimeLinter: Enable Load-Save Linting** - Enables load-save linting mode for the current view and clears all lint errors.
-* **SublimeLinter: Enable Save-Only Linting** - Enables save-only linting mode for the current view and clears all lint errors.
+* **SublimeLinter: Background Linting** - Enables background linting mode for the current view and lints it.
+* **SublimeLinter: Disable Linting** - Disables linting mode for the current view and clears all lint errors.
+* **SublimeLinter: Load-Save Linting** - Enables load-save linting mode for the current view and clears all lint errors.
+* **SublimeLinter: Save-Only Linting** - Enables save-only linting mode for the current view and clears all lint errors.
 * **SublimeLinter: Reset** - Clears all lint errors and sets the linting mode to the value in the SublimeLinter.sublime-settings file.
 
 Depending on the file and the current state of background enabling, some of the commands will not be available.

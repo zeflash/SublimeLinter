@@ -909,7 +909,7 @@ class SublimelinterDisableCommand(SublimelinterCommand):
         if enabled:
             view = self.window.active_view()
 
-            if view and not view.settings().get('sublimelinter') == True:
+            if view and view.settings().get('sublimelinter') == 'on':
                 return False
 
         return enabled
