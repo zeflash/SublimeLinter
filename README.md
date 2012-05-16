@@ -46,6 +46,20 @@ The "Packages" directory is located at:
 
         %APPDATA%/Sublime Text 2/Packages/
 
+### Javascript-based linters
+If you plan to edit files that use a Javascript-based linter (Javascript, CSS), your system
+must have a Javascript engine installed. Mac OS X comes with a preinstalled Javascript engine called
+JavaScriptCore, which is used if Node.js is not installed. On Windows, you **must** install the
+Javascript engine Node.js, which can be downloaded from [the Node.js site](http://nodejs.org/#download).
+
+On Mac OS X, you **must** install Node.js if you plan to edit Javascript or CSS files that
+use non-ASCII characters in strings or comments, because JavaScriptCore is not Unicode-aware.
+
+After installing Node.js, if the Node.js executable ("node" on Mac OS X, "node.exe" on Windows)
+cannot be found by SublimeLinter, you may have to set the path to the executable in the
+"sublimelinter\_executable\_map" setting. See the "Configuring" section below for info on
+SublimeLinter settings.
+
 Configuring
 -----------
 There are a number of settings available to customize the behavior of SublimeLinter and its linters. For the latest information on what settings are available, select the menu item `Preferences->Package Settings->SublimeLinter->Settings - Default`.
@@ -55,7 +69,7 @@ Do **NOT** edit the default SublimeLinter settings. Your changes will be lost wh
 ### Linter-specific notes
 Following are notes specific to individual linters that you should be aware of:
 
-* **JavaScript** - If the "javascript_linter" setting is "jshint" or "jslint", this linter runs [jshint](http://jshint.org) (or [jslint](http://jslint.com) respectively) using node.js, which can be downloaded from [the node.js site](http://nodejs.org/#download). After installation, if node cannot be found by SublimeLinter, you may have to set the path to node in the "sublimelinter\_executable\_map" setting. See "Configuring" below for info on SublimeLinter settings. If node.js is not installed on Mac OS X, JavaScriptCore will be used.
+* **JavaScript** - If the "javascript_linter" setting is "jshint" or "jslint", this linter runs [jshint](http://jshint.org) (or [jslint](http://jslint.com) respectively) using Node.js. See "Javascript-based linters" above for information on how to install Node.js.
 
   If the "javascript_linter" setting is "gjslint", this linter runs the [closure linter (gjslint)](https://developers.google.com/closure/utilities/docs/linter_howto). After installation, if gjslint cannot be found by SublimeLinter, you may have to set the path to gjslint in the "sublimelinter\_executable\_map" setting.
 
@@ -338,7 +352,7 @@ If you wish to create a new linter to support a new language, SublimeLinter make
 
 * If you linter is powered via Javascript (eg. Node.js), there are few steps that will simplify the integration.
 
-  Create a folder matching your linter name in the `SublimeLinter/sublimelinter/modules/lib` directory. This folder should include the linting library JS file (eg. jshint.js, csslint-node.js) and a **linter.js** file. The **linter.js** file should `require()` the actual linter library file and export a `lint()` function. The `lint()` function should return a list of errors back to the python language handler file (via the `errors` parameter to the `parse_errors()` method).
+  Create a folder matching your linter name in the `SublimeLinter/sublimelinter/modules/lib` directory. This folder should include the linting library JS file (eg. jshint.js, csslint-Node.js) and a **linter.js** file. The **linter.js** file should `require()` the actual linter library file and export a `lint()` function. The `lint()` function should return a list of errors back to the python language handler file (via the `errors` parameter to the `parse_errors()` method).
 
   Although **linter.js** should follow the Node.js api, the linter may also be run via JavaScriptCore on OS X if Node.js is not installed. In the case where JavaScriptCore is used, require + export are shimmed to keep things consistent. However, it is important not to assume that a full Node.js api is available. If you must know what JS engine you are using, you may check for `USING_JSC` to be set as `true` when JavaScriptCore is used.
 
