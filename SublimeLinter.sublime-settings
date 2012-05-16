@@ -12,10 +12,11 @@
     "sublimelinter": true,
 
     /*
-        Maps linters to executables for non-built in linters. If the executable
-        is not in the default system path, or on posix systems in /usr/local/bin
-        or ~/bin, then you must specify the full path to the executable.
-        Linter names should be lowercase.
+        Maps linter names (which should be all lowercase) to executables
+        for non-built in linters. If the executable is not in the default system path,
+        or on posix systems is not in /usr/local/bin or ~/bin, then you must specify
+        the full path to the executable. Note that paths in Windows must use double
+        backslashes, for example "C:\\Program Files (x86)\\nodejs\\node.exe".
 
         This is the effective default map; your mappings may override these.
 
