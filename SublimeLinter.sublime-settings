@@ -136,9 +136,14 @@
         "zero-units": "warning"
     },
 
-    // A list of pep8 error numbers to ignore. By default "line too long" errors are ignored.
-    // The list of error codes is in this file: https://github.com/jcrocholl/pep8/blob/master/pep8.py.
-    // Search for "Ennn:", where nnn is a 3-digit number.
+    // Set this to false to turn pep8 checking off completely
+    "pep8": true,
+
+    /*
+        A list of pep8 error numbers to ignore. By default "line too long" errors are ignored.
+        The list of error codes is in this file: https://github.com/jcrocholl/pep8/blob/master/pep8.py.
+        Search for "Ennn:", where nnn is a 3-digit number.
+    */
     "pep8_ignore":
     [
         "E501"
@@ -168,10 +173,11 @@
     */
     "pyflakes_ignore_import_*": true,
 
-    // Perl linter: "perl" to use the Perl language syntax check,
-    // or "perlcritic" to use Perl::Critic linting.
-    // Perl is now set to use "perlcritic" by default due to a vulnerability with blindly running `perl -c`
-    // on files with `BEGIN` or `CHECK` blocks (see issue #77: https://github.com/Kronuz/SublimeLinter/issues/77).
+    /*
+        Perl linter: "perl" to use the Perl language syntax check, or "perlcritic" to use Perl::Critic linting.
+        Perl is now set to use "perlcritic" by default due to a vulnerability with blindly running `perl -c`
+        on files with `BEGIN` or `CHECK` blocks.
+    */
     "perl_linter": "perlcritic",
 
     // Objective-J: if true, non-ascii characters are flagged as an error.
