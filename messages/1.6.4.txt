@@ -1,5 +1,14 @@
 SublimeLinter 1.6.4 changelog
 
+IMPORTANT!!
+
+Please note that the SublimeLinter repository has moved to:
+
+  https://github.com/SublimeLinter/SublimeLinter
+
+Issues and pull requests should be made there.
+
+
 NEW FEATURES
 
 - The Objective-J linter now catches spaces inside parentheses
