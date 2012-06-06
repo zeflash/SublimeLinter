@@ -163,6 +163,7 @@ class Linter(BaseLinter):
             pep8.options = FakeOptions()
             pep8.options.physical_checks = pep8.find_checks('physical_line')
             pep8.options.logical_checks = pep8.find_checks('logical_line')
+            pep8.options.max_line_length = pep8.MAX_LINE_LENGTH
             pep8.options.counters = dict.fromkeys(pep8.BENCHMARK_KEYS, 0)
             good_lines = [l + '\n' for l in _lines]
             good_lines[-1] = good_lines[-1].rstrip('\n')
@@ -172,8 +173,8 @@ class Linter(BaseLinter):
 
             try:
                 pep8.Checker(filename, good_lines).check_all()
-            except:
-                pass
+            except Exception, e:
+                print "An exception occured when running pep8 checker: %s" % e
 
         return messages
 
