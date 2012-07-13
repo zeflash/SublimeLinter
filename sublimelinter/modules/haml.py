@@ -6,7 +6,7 @@ import re
 from base_linter import BaseLinter
 
 CONFIG = {
-    'language': 'haml',
+    'language': 'ruby haml',
     'executable': 'haml',
     'lint_args': '-c'
 }
