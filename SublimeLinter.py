@@ -121,9 +121,6 @@ def update_statusbar(view):
 
 def run_once(linter, view, **kwargs):
     '''run a linter on a given view regardless of user setting'''
-    if view.settings().get('sublimelinter_notes'):
-        highlight_notes(view)
-
     if not linter:
         return
 
@@ -140,6 +137,10 @@ def run_once(linter, view, **kwargs):
     UNDERLINES[vid].extend(warning_underlines)
 
     add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines)
+
+    if view.settings().get('sublimelinter_notes'):
+        highlight_notes(view)
+
     update_statusbar(view)
     end = time.time()
     TIMES[vid] = (end - start) * 1000  # Keep how long it took to lint
