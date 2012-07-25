@@ -61,6 +61,14 @@
     // If true, lines with errors or warnings will be filled in with the outline color.
     "sublimelinter_fill_outlines": false,
 
+    /*
+        If true, lines with errors or warnings will have an outline box drawn.
+        If false, the boxes won't be drawn and "sublimelinter_fill_outlines"
+        options will be ignored. This is useful if you only want to see
+        gutter marks.
+    */
+    "sublimelinter_show_outlines": true,
+
     // If true, lines with errors or warnings will have a gutter mark.
     "sublimelinter_gutter_marks": false,
 
