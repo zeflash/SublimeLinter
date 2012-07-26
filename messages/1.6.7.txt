@@ -1,0 +1,13 @@
+SublimeLinter 1.6.7 changelog
+
+NEW FEATURES
+
+- Puppet linting is now supported via `puppet parser validate`.
+
+- Added an option to hide outline decorations. Set the value of
+  `sublimelinter_show_outlines` to `false` in the user settings.
+
+
+CHANGES/FIXES
+
+-
