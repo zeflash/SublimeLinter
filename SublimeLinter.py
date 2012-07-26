@@ -213,7 +213,7 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
 
     if lines:
         fill_outlines = view.settings().get('sublimelinter_fill_outlines', False)
-        show_outlines = view.settings().get('sublimelinter_show_outlines', False)
+        show_outlines = view.settings().get('sublimelinter_show_outlines', True)
         gutter_mark_enabled = True if view.settings().get('sublimelinter_gutter_marks', False) else False
 
         outlines = {'warning': [], 'violation': [], 'illegal': []}
