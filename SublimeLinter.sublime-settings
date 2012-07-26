@@ -8,6 +8,7 @@
         true - Linting occurs in the background as you type (the default).
         false - Linting only occurs when you initiate it.
         "load-save" - Linting occurs only when a file is loaded and saved.
+        "save-only" - Linting occurs only when a file is saved.
     */
     "sublimelinter": true,
 
