@@ -29,4 +29,4 @@ class Linter(BaseLinter):
             subprocess.call([path, '-v'], startupinfo=self.get_startupinfo())
             return (True, path, 'using {0}'.format(self.linter))
         except OSError:
-            return (False, '', '{0} is required'.format('luac'))
+            return (False, '', 'luac is required')
