@@ -58,16 +58,23 @@
     */
     "sublimelinter_delay": 0,
 
-    // If true, lines with errors or warnings will be filled in with the outline color.
-    "sublimelinter_fill_outlines": false,
+    /*
+        Selects the way the lines with errors or warnings are marked; "outline"
+        (default) draws outline boxes around the lines, "fill" fills the lines
+        with the outline color (identical to deprecated setting
+        "sublimelinter_fill_outlines"), and "none" disables any markings
+        (useful if "sublimelinter_gutter_marks" is set).
+    */
+    "sublimelinter_outline_style": "outline",
 
     /*
-        If true, lines with errors or warnings will have an outline box drawn.
-        If false, the boxes won't be drawn and "sublimelinter_fill_outlines"
-        options will be ignored. This is useful if you only want to see
-        gutter marks.
+        If true, lines with errors or warnings will be filled in with the
+        outline color. This setting is DEPRECATED and will be ignored in future
+        versions. Use "sublimelinter_outline_style" instead. For backwards
+        compatibility reasons, this setting overrides "outline_style" if that
+        one is set to "outline", but has no effect if it's set to "none".
     */
-    "sublimelinter_show_outlines": true,
+    "sublimelinter_fill_outlines": false,
 
     // If true, lines with errors or warnings will have a gutter mark.
     "sublimelinter_gutter_marks": false,
