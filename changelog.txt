@@ -331,7 +331,7 @@ NEW FEATURES
 - Puppet linting is now supported via `puppet parser validate`.
 
 - Added an option for more granular control of outline decorations. Set the
-  value of "sublimelinter_outline_style" to "outline", "fill", or "none" in
+  value of "sublimelinter_mark_style" to "outline", "fill", or "none" in
   the user settings.
 
 

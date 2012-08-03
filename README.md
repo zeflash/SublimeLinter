@@ -172,20 +172,20 @@ or define separate substyles for one or more types to color them differently.
 If you want to make the offending lines glaringly obvious (perhaps for those
 who tend to ignore lint errors), you can set the user setting:
 
-    "sublimelinter_fill_outlines": true
+    "sublimelinter_mark_style": "fill"
 
 When this is set true, lines that have errors will be colored with the background
 and foreground color of the "sublime.outline.<type>" theme style. Unless you have defined
-those styles, this setting should be left false.
+those styles, this setting should be left as "outline".
+
+You may want to disable drawing of outline boxes entirely. If so, change
+using the user setting to:
+
+    "sublimelinter_mark_style": "none"
 
 You may also mark lines with errors by putting an "x" in the gutter with the user setting:
 
     "sublimelinter_gutter_marks": true
-
-If you do so, you may want to disable drawing of outline boxes entirely so only
-the gutter marks are shown, using the user setting:
-
-    "sublimelinter_show_outlines": false
 
 To customize the colors used for highlighting errors and user notes, add the following
 to your theme (adapting the color to your liking):

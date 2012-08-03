@@ -62,10 +62,9 @@ ALL_SETTINGS = [
     'sublimelinter_executable_map',
     'sublimelinter_fill_outlines',
     'sublimelinter_gutter_marks',
-    'sublimelinter_show_outlines',
+    'sublimelinter_mark_style',
     'sublimelinter_notes',
     'sublimelinter_objj_check_ascii',
-    'sublimelinter_outline_style',
     'sublimelinter_popup_errors_on_save',
     'sublimelinter_syntax_map',
     'sublimelinter_wrap_find',
@@ -213,7 +212,7 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
             view.add_regions('lint-underline-' + type_name, underlines, 'sublimelinter.underline.' + type_name, sublime.DRAW_EMPTY_AS_OVERWRITE)
 
     if lines:
-        outline_style = view.settings().get('sublimelinter_outline_style', 'outline')
+        outline_style = view.settings().get('sublimelinter_mark_style', 'outline')
 
         # This test is for the legacy "fill" setting; it will be removed
         # in a future version (likely v1.7).
