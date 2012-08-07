@@ -20,6 +20,7 @@ SublimeLinter has built in linters for the following languages:
 * Puppet - syntax checking via `puppet parser validate`
 * Python - native, moderately-complete lint
 * Ruby - syntax checking via `ruby -wc`
+* XML - syntax checking via `xmllint`
 
 
 Installing
