@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-# html.py - sublimelint package for checking html files
+# xml.py - sublimelint package for checking xml files
 
-from xmllint_linter import XmllintLinter
+import re
+
+from base_linter import BaseLinter
 
 CONFIG = {
     'language': 'xml',
@@ -10,5 +12,12 @@ CONFIG = {
 }
 
 
-class Linter(XmllintLinter):
-  pass
+class Linter(BaseLinter):
+    def parse_errors(self, view, errors, lines, errorUnderlines, violationUnderlines, warningUnderlines, errorMessages, violationMessages, warningMessages):
+
+        for line in errors.splitlines():
+            match = re.match(r'\-\:(?P<line>\d+): (?P<error>.+)', line)
+
+            if match:
+                error, line = match.group('error'), match.group('line')
+                self.add_message(int(line), lines, error, errorMessages)
