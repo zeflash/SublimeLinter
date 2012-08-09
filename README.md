@@ -325,6 +325,8 @@ By default the search will wrap. You can turn wrapping off with the user setting
 
     "sublimelinter_wrap_find": false
 
+Please note: these key commands may conflict with other important cmds (such as generating the € character - this was discussed in issue [#182](https://github.com/SublimeLinter/SublimeLinter/issues/182)). If these controls are problematic, you may always adjust your settings by copying the defaults stored in `Preferences->Package Settings->SublimeLinter->Key Bindings - Default` into `Preferences->Key Bindings - User` and then modifying the values appropriately.
+
 Troubleshooting
 ---------------
 If a linter does not seem to be working, you can check the ST2 console to see if it was enabled. When SublimeLinter is loaded, you will see messages in the console like this:
