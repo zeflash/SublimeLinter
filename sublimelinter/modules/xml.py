@@ -6,7 +6,7 @@ import re
 from base_linter import BaseLinter
 
 CONFIG = {
-    'language': 'xml',
+    'language': 'XML',
     'executable': 'xmllint',
     'lint_args': ['-noout', '-']
 }
