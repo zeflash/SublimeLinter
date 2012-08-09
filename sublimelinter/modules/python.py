@@ -125,7 +125,7 @@ class Linter(BaseLinter):
                     error = PythonError(filename, value, msg)
             return [error]
         except ValueError, e:
-            return [PythonError(filename, 0, e.args[0])]
+            return [PythonError(filename, Dict2Obj(lineno=0, offset=0, text=e.args[0]), e.args[0])]
         else:
             # Okay, it's syntactically valid.  Now check it.
             if ignore is not None:
