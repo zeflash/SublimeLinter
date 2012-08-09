@@ -131,7 +131,7 @@ def run_once(linter, view, **kwargs):
     WARNINGS[vid] = {}
     start = time.time()
     text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
-    lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(view, text, view.file_name() or '')
+    lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(view, text, view.file_name().encode('utf-8') or '')
 
     UNDERLINES[vid] = error_underlines[:]
     UNDERLINES[vid].extend(violation_underlines)
