@@ -1,0 +1,15 @@
+SublimeLinter 1.6.8 changelog
+
+NEW FEATURES
+
+- HTML5 linting support via `tidy`. This linter will not run unless you have
+  a version of tidy with HTML5 support. To use this linter, please see:
+  https://github.com/w3c/tidy-html5
+
+- XML linting via `xmllint`.
+
+
+CHANGES/FIXES
+
+- Fixed issue (#181). Linter no longer throws errors with filenames using
+  non-ascii (UTF-8) characters.
