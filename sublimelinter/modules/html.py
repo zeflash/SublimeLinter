@@ -12,7 +12,7 @@ import re
 from base_linter import BaseLinter
 
 CONFIG = {
-    'language': 'html',
+    'language': 'HTML',
     'executable': 'tidy',
     'lint_args': '-eq'
 }
@@ -26,4 +26,3 @@ class Linter(BaseLinter):
             if match:
                 error, line = match.group('error'), match.group('line')
                 self.add_message(int(line), lines, error, errorMessages)
-
