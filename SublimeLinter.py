@@ -402,7 +402,7 @@ def _update_view(view, filename, **kwargs):
                 valid_view = True
                 break
 
-    if not valid_view or view.is_loading() or view.file_name() != filename:
+    if not valid_view or view.is_loading() or view.file_name().encode('utf-8') != filename:
         return
 
     try:
@@ -428,7 +428,7 @@ def queue_linter(linter, view, timeout=-1, preemptive=False, event=None):
         busy_timeout = timeout
 
     kwargs = {'timeout': timeout, 'busy_timeout': busy_timeout, 'preemptive': preemptive, 'event': event}
-    queue(view, partial(_update_view, view, view.file_name(), **kwargs), kwargs)
+    queue(view, partial(_update_view, view, view.file_name().encode('utf-8'), **kwargs), kwargs)
 
 
 def _callback(view, filename, kwargs):
@@ -608,7 +608,7 @@ def reload_view_module(view):
     for name, linter in LINTERS.items():
         module = sys.modules[linter.__module__]
 
-        if module.__file__ == view.file_name():
+        if module.__file__ == view.file_name().encode('utf-8'):
             print 'SublimeLinter: reloading language:', linter.language
             MOD_LOAD.reload_module(module)
             lint_views(linter)
@@ -859,8 +859,8 @@ class SublimelinterAnnotationsCommand(SublimelinterWindowCommand):
         if not view:
             return
 
-        text = view.substr(sublime.Region(0, view.size()))
-        filename = view.file_name()
+        text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
+        filename = view.file_name().encode('utf-8')
         notes = linter.extract_annotations(text, view, filename)
         _, filename = os.path.split(filename)
         annotations_view, _id = view_in_tab(view, 'Annotations from {0}'.format(filename), notes, '')
