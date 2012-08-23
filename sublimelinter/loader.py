@@ -8,7 +8,7 @@ import sys
 
 import modules.base_linter as base_linter
 
-libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'modules', 'libs'))
+libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'modules', 'libs')).encode('utf-8')
 
 if libs_path not in sys.path:
     sys.path.insert(0, libs_path)
@@ -30,10 +30,10 @@ class Loader(object):
         if os.name != 'posix':
             return
 
-        path = os.environ['PATH']
+        path = os.environ['PATH'].encode('utf-8')
 
         if path:
-            dirs = path.split(':')
+            dirs = path.encode('utf-8').split(':')
 
             if '/usr/local/bin' not in dirs:
                 dirs.insert(0, '/usr/local/bin')
@@ -59,7 +59,7 @@ class Loader(object):
         fullmod = '{0}.{1}'.format(self.modpath, name)
 
         # make sure the path didn't change on us (this is needed for submodule reload)
-        pushd = os.getcwd()
+        pushd = os.getcwd().encode('utf-8')
         os.chdir(self.basedir)
 
         __import__(fullmod)
@@ -75,7 +75,7 @@ class Loader(object):
 
         # update module's __file__ to absolute path so we can reload it
         # if saved with sublime text
-        mod.__file__ = os.path.abspath(mod.__file__).rstrip('co')
+        mod.__file__ = os.path.abspath(mod.__file__).rstrip('co').encode('utf-8')
 
         language = ''
 
