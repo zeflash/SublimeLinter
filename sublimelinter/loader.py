@@ -8,7 +8,7 @@ import sys
 
 import modules.base_linter as base_linter
 
-libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'modules', 'libs')).encode('utf-8')
+libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), 'modules', 'libs'))
 
 if libs_path not in sys.path:
     sys.path.insert(0, libs_path)
