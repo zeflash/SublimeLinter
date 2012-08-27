@@ -8,7 +8,7 @@ from base_linter import BaseLinter, INPUT_METHOD_FILE
 CONFIG = {
     'language': 'C++',
     'executable': 'cppcheck',
-    'lint_args': ['--enable=all', '{filename}'],
+    'lint_args': ['--enable=style', '--quiet', '{filename}'],
     'input_method': INPUT_METHOD_FILE
 }
 
