@@ -65,7 +65,7 @@ CONFIG = {
     'input_method': INPUT_METHOD_STDIN
 }
 
-TEMPFILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.tempfiles'))
+TEMPFILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), u'..', u'.tempfiles'))
 
 JSON_MULTILINE_COMMENT_RE = re.compile(r'\/\*[\s\S]*?\*\/')
 JSON_SINGLELINE_COMMENT_RE = re.compile(r'\/\/[^\n\r]*')
@@ -88,7 +88,7 @@ class BaseLinter(object):
 
     JSC_PATH = '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
 
-    LIB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'libs'))
+    LIB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), u'libs'))
 
     JAVASCRIPT_ENGINES = ['node', 'jsc']
     JAVASCRIPT_ENGINE_NAMES = {'node': 'node.js', 'jsc': 'JavaScriptCore'}

@@ -20,7 +20,7 @@ VIOLATIONS = {}  # violation messages, they are displayed in the status bar
 WARNINGS = {}    # warning messages, they are displayed in the status bar
 UNDERLINES = {}  # underline regions related to each lint message
 TIMES = {}       # collects how long it took the linting to complete
-MOD_LOAD = Loader(os.getcwd(), LINTERS)  # utility to load (and reload
+MOD_LOAD = Loader(os.getcwdu(), LINTERS)  # utility to load (and reload
                  # if necessary) linter modules [useful when working on plugin]
 
 
