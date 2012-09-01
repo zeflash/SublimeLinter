@@ -8,10 +8,26 @@ import sys
 
 import modules.base_linter as base_linter
 
-libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), u'modules', u'libs'))
+# sys.path appears to ignore individual paths with unicode characters.
+# This means that this lib_path will be ignored for Windows 7 users with
+# non-ascii characters in their username (thus as their home directory).
+#
+# libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), u'modules', u'libs'))
+#
+# if libs_path not in sys.path:
+#     sys.path.insert(0, libs_path)
 
-if libs_path not in sys.path:
-    sys.path.insert(0, libs_path)
+# As a fix for the Windows 7 lib path issue (#181), the individual modules in
+# the `libs` folder can be explicitly imported. This obviously doesn't scale
+# well, but may be a necessary evil until ST2 upgrades its internal Python.
+tmpdir = os.getcwdu()
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), u'modules', u'libs')))
+
+for mod in [u'capp_lint', u'pep8', u'pyflakes.checker']:
+    __import__(mod)
+    print u'imported {0}'.format(mod)
+
+os.chdir(tmpdir)
 
 
 class Loader(object):
