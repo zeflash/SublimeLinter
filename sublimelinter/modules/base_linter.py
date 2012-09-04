@@ -159,7 +159,7 @@ class BaseLinter(object):
                 args = settings.get('lint_args', [])
                 lintArgs.extend(args)
 
-                cwd = settings.get('working_directory')
+                cwd = settings.get('working_directory').encode('utf-8')
 
                 if cwd and os.path.isabs(cwd) and os.path.isdir(cwd):
                     os.chdir(cwd)
@@ -180,7 +180,7 @@ class BaseLinter(object):
             if filename:
                 filename = os.path.basename(filename)
             else:
-                filename = 'view{0}'.format(view.id())
+                filename = u'view{0}'.format(view.id())
 
             tempfilePath = os.path.join(TEMPFILES_DIR, filename)
 
@@ -188,14 +188,14 @@ class BaseLinter(object):
                 f.write(code)
 
             args.extend(self._get_lint_args(view, code, tempfilePath))
-            code = ''
+            code = u''
 
         elif self.input_method == INPUT_METHOD_FILE:
             args.extend(self._get_lint_args(view, code, filename))
-            code = ''
+            code = u''
 
         else:
-            return ''
+            return u''
 
         try:
             process = subprocess.Popen(args,
