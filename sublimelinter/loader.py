@@ -20,10 +20,11 @@ import modules.base_linter as base_linter
 # As a fix for the Windows 7 lib path issue (#181), the individual modules in
 # the `libs` folder can be explicitly imported. This obviously doesn't scale
 # well, but may be a necessary evil until ST2 upgrades its internal Python.
+#
 tmpdir = os.getcwdu()
 os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), u'modules', u'libs')))
 
-for mod in [u'capp_lint', u'pep8', u'pyflakes.checker']:
+for mod in [u'capp_lint', u'pep8', u'pyflakes']:
     __import__(mod)
     print u'imported {0}'.format(mod)
 
@@ -58,7 +59,7 @@ class Loader(object):
                 dirs.append(u'$HOME/bin')
 
             os.environ['PATH'] = u':'.join(dirs)
-        print os.environ['PATH']
+
 
     def load_all(self):
         '''loads all existing linter modules'''

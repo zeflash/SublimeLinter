@@ -125,15 +125,18 @@ class Linter(BaseLinter):
                     error = PythonError(filename, value, msg)
             return [error]
         except ValueError, e:
-            return [PythonError(filename, Dict2Obj(lineno=0, offset=0, text=e.args[0]), e.args[0])]
+            return [PythonError(filename, 0, e.args[0])]
         else:
             # Okay, it's syntactically valid.  Now check it.
             if ignore is not None:
                 old_magic_globals = pyflakes._MAGIC_GLOBALS
                 pyflakes._MAGIC_GLOBALS += ignore
+
             w = pyflakes.Checker(tree, filename)
+
             if ignore is not None:
                 pyflakes._MAGIC_GLOBALS = old_magic_globals
+
             return w.messages
 
     def pep8_check(self, code, filename, ignore=None):
