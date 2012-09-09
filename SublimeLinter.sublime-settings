@@ -62,7 +62,7 @@
         errors are erased when the file is modified, since the assumption is
         you don't want to see errors while you type.
     */
-    "sublimelinter_delay": 0,
+    "sublimelinter_delay": 2,
 
     /*
         Selects the way the lines with errors or warnings are marked; "outline"
@@ -100,7 +100,10 @@
     // By deault, eval is allowed.
     "jshint_options":
     {
-        "indent": 1,
+        // To fix column positions for JSHint errors you may want to add `"indent": 1` to your
+        // **User** "jshint_options". This issue affects users with tabs for indentation.
+        // This fix was reverted due to a conflict with using the `"white": true` option.
+        // "indent": 1,
         "evil": true,
         "regexdash": true,
         "browser": true,
