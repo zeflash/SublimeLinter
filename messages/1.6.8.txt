@@ -11,7 +11,20 @@ NEW FEATURES
 
 CHANGES/FIXES
 
-- Fixed issue (#181). Linter no longer throws errors with filenames using
-  non-ascii (UTF-8) characters.
+- Made significant progress on issue (#181). However, SublimeLinter still
+  throws with some linter types on Windows 7 when a user has non-ascii
+  characters in the path (to the SL plugin).
 
-- Updated JSHint to latest stable (r09).
+- Updated PEP8 to v1.1
+
+- Updated Pyflakes to v0.5.0
+
+- Updated JSHint to latest stable (r11).
+
+- Reverted a fix for accurate (JSHint) error column positions (when using tab
+  indentation) due to a regression with the `"white": true` option. You may
+  still manually fix error positions by setting `"indent": 1`.
+
+- Changed (the default) background linting delay to a more sane 2 seconds.
+  This reduces memory usage, cpu processing, and visual noise while you are
+  actively writing code.
