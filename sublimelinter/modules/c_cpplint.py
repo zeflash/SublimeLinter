@@ -6,7 +6,7 @@ import re
 from base_linter import BaseLinter, INPUT_METHOD_TEMP_FILE
 
 CONFIG = {
-    'language': 'C++',
+    'language': 'c_cpplint',
     'executable': 'cpplint.py',
     'test_existence_args': ['--help'],
     'lint_args': '{filename}',
