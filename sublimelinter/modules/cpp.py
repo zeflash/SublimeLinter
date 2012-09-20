@@ -8,6 +8,7 @@ from base_linter import BaseLinter, INPUT_METHOD_TEMP_FILE
 CONFIG = {
     'language': 'C++',
     'executable': 'cpplint.py',
+    'test_existence_args': ['--help'],
     'lint_args': '{filename}',
     'input_method': INPUT_METHOD_TEMP_FILE
 }
