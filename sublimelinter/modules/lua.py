@@ -5,7 +5,7 @@ import re
 from base_linter import BaseLinter
 
 CONFIG = {
-    'language': 'lua',
+    'language': 'Lua',
     'executable': 'luac',
     'lint_args': '-'
 }
