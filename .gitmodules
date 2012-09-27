@@ -1,0 +1,3 @@
+[submodule "sublimelinter/modules/libs/pep8"]
+	path = sublimelinter/modules/libs/pep8
+	url = https://github.com/jcrocholl/pep8.git
