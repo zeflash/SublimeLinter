@@ -1,7 +1,7 @@
 /*jslint node: true, sloppy: true */
 /*globals LINTER_PATH, load */
 
-var CSSLint = require("./csslint-node").CSSLint;
+var CSSLint = require("./repo/release/csslint-node").CSSLint;
 
 exports.lint = function (code, config) {
     var results = [];

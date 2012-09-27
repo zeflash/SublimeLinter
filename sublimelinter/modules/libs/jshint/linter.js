@@ -1,7 +1,7 @@
 /*jshint node: true */
 /*globals LINTER_PATH load */
 
-var JSHINT = require("./jshint").JSHINT;
+var JSHINT = require("./repo/jshint").JSHINT;
 
 exports.lint = function (code, config) {
     var results = [];
