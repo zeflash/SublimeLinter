@@ -1,3 +1,9 @@
-[submodule "sublimelinter/modules/libs/pep8"]
+[submodule "pep8"]
 	path = sublimelinter/modules/libs/pep8
 	url = https://github.com/jcrocholl/pep8.git
+[submodule "csslint"]
+	path = sublimelinter/modules/libs/csslint/repo
+	url = https://github.com/stubbornella/csslint.git
+[submodule "jshint"]
+	path = sublimelinter/modules/libs/jshint/repo
+	url = https://github.com/jshint/jshint.git
