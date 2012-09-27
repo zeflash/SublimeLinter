@@ -15,6 +15,20 @@
 					}
 				]
 			}
+		},
+		{
+			"name": "SublimeLinter (dev channel)",
+			"description": "This version is considered unstable; only install this package if you plan on testing",
+			"author": "Kronuz, Aparajita Fishman, Jake Swartwood",
+			"homepage": "https://github.com/SublimeLinter/SublimeLinter/tree/dev",
+			"platforms": {
+				"*": [
+					{
+						"version": "1.6.9a",
+						"url": "https://nodeload.github.com/SublimeLinter/SublimeLinter/zipball/dev"
+					}
+				]
+			}
 		}
 	]
 }
