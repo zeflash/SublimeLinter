@@ -392,3 +392,7 @@ If you wish to create a new linter to support a new language, SublimeLinter make
 
 
 If your linter has more complex requirements, see the comments for CONFIG in base\_linter.py, and use the existing linters as guides.
+
+Beta
+----
+The SublimeLinter Beta package is available via Package Control. The beta version is considered unstable and should only be used for testing the next release. If you like living on the edge, please report any bugs you find on the [SublimeLinter issues](https://github.com/SublimeLinter/SublimeLinter/issues) page.

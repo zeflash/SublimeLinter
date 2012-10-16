@@ -389,3 +389,9 @@ NEW FEATURES
 
 - Lua syntax check via `luac`.
 
+
+CHANGES/FIXES
+
+- Adding a 'beta' channel for SublimeLinter into Package Control. This
+  branch will act as a more formal method for testing new features and
+  fixes before a release.
