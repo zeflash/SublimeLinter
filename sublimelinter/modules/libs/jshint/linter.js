@@ -4,7 +4,7 @@
 var JSHINT = require("./jshint").JSHINT;
 
 exports.lint = function (code, config) {
-    var globals = {},
+    var globals,
         results = [];
 
     if (config.globals) {
