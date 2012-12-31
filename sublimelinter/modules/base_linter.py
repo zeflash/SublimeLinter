@@ -375,7 +375,7 @@ class BaseLinter(object):
 
     def get_javascript_options(self, view):
         '''Subclasses should override this if they want to provide options
-           for a Javascript-based linter. If the subclass cannot provide
+           for a JavaScript-based linter. If the subclass cannot provide
            options, it should return None (or not return anything).'''
         return None
 
@@ -409,4 +409,4 @@ class BaseLinter(object):
 
         # Didn't find an engine, tell the user
         engine_list = ', '.join(self.JAVASCRIPT_ENGINE_NAMES.values())
-        return (False, '', 'One of the following Javascript engines must be installed: ' + engine_list)
+        return (False, '', 'One of the following JavaScript engines must be installed: ' + engine_list)
