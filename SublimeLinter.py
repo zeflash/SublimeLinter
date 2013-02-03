@@ -9,8 +9,8 @@ import threading
 import sublime
 import sublime_plugin
 
-from sublimelinter.loader import Loader
-from sublimelinter.modules.base_linter import INPUT_METHOD_FILE
+from .sublimelinter.loader import Loader
+from .sublimelinter.modules.base_linter import INPUT_METHOD_FILE
 
 LINTERS = {}     # mapping of language name to linter module
 QUEUE = {}       # views waiting to be processed by linter
@@ -20,7 +20,7 @@ VIOLATIONS = {}  # violation messages, they are displayed in the status bar
 WARNINGS = {}    # warning messages, they are displayed in the status bar
 UNDERLINES = {}  # underline regions related to each lint message
 TIMES = {}       # collects how long it took the linting to complete
-MOD_LOAD = Loader(os.getcwdu(), LINTERS)  # utility to load (and reload
+MOD_LOAD = Loader(os.getcwd(), LINTERS)  # utility to load (and reload
                  # if necessary) linter modules [useful when working on plugin]
 
 
@@ -130,8 +130,8 @@ def run_once(linter, view, **kwargs):
     VIOLATIONS[vid] = {}
     WARNINGS[vid] = {}
     start = time.time()
-    text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
-    lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(view, text, view.file_name().encode('utf-8') or '')
+    text = view.substr(sublime.Region(0, view.size()))
+    lines, error_underlines, violation_underlines, warning_underlines, ERRORS[vid], VIOLATIONS[vid], WARNINGS[vid] = linter.run(view, text, view.file_name() or '')
 
     UNDERLINES[vid] = error_underlines[:]
     UNDERLINES[vid].extend(violation_underlines)
@@ -155,7 +155,7 @@ def popup_error_list(view):
     errors = ERRORS[vid].copy()
 
     for message_map in [VIOLATIONS[vid], WARNINGS[vid]]:
-        for line, messages in message_map.items():
+        for line, messages in list(message_map.items()):
             if line in errors:
                 errors[line].extend(messages)
             else:
@@ -172,7 +172,7 @@ def popup_error_list(view):
 
     for error in error_list:
         line_text = view.substr(view.full_line(view.text_point(error['line'], 0)))
-        item = [error['message'], u'{0}: {1}'.format(error['line'] + 1, line_text.strip())]
+        item = [error['message'], '{0}: {1}'.format(error['line'] + 1, line_text.strip())]
         panel_items.append(item)
 
     def on_done(selected_item):
@@ -207,7 +207,7 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
     erase_lint_marks(view)
     types = {'warning': warning_underlines, 'violation': violation_underlines, 'illegal': error_underlines}
 
-    for type_name, underlines in types.items():
+    for type_name, underlines in list(types.items()):
         if underlines:
             view.add_regions('lint-underline-' + type_name, underlines, 'sublimelinter.underline.' + type_name, sublime.DRAW_EMPTY_AS_OVERWRITE)
 
@@ -368,7 +368,7 @@ def select_linter(view, ignore_disabled=False):
             # user settings cannot be loaded during plugin startup.
             if not linter.enabled:
                 enabled, message = linter.check_enabled(view)
-                print 'SublimeLinter: {0} {1} ({2})'.format(language, 'enabled' if enabled else 'disabled', message)
+                print('SublimeLinter: {0} {1} ({2})'.format(language, 'enabled' if enabled else 'disabled', message))
 
                 if not enabled:
                     del LINTERS['' + language]
@@ -402,13 +402,13 @@ def _update_view(view, filename, **kwargs):
                 valid_view = True
                 break
 
-    if not valid_view or view.is_loading() or view.file_name().encode('utf-8') != filename:
+    if not valid_view or view.is_loading() or view.file_name() != filename:
         return
 
     try:
         run_once(select_linter(view), view, **kwargs)
-    except RuntimeError, ex:
-        print ex
+    except RuntimeError as ex:
+        print(ex)
 
 
 def queue_linter(linter, view, timeout=-1, preemptive=False, event=None):
@@ -428,7 +428,7 @@ def queue_linter(linter, view, timeout=-1, preemptive=False, event=None):
         busy_timeout = timeout
 
     kwargs = {'timeout': timeout, 'busy_timeout': busy_timeout, 'preemptive': preemptive, 'event': event}
-    queue(view, partial(_update_view, view, view.file_name().encode('utf-8'), **kwargs), kwargs)
+    queue(view, partial(_update_view, view, view.file_name(), **kwargs), kwargs)
 
 
 def _callback(view, filename, kwargs):
@@ -439,7 +439,7 @@ def background_linter():
     __lock_.acquire()
 
     try:
-        callbacks = QUEUE.values()
+        callbacks = list(QUEUE.values())
         QUEUE.clear()
     finally:
         __lock_.release()
@@ -605,11 +605,11 @@ def lint_views(linter):
 
 
 def reload_view_module(view):
-    for name, linter in LINTERS.items():
+    for name, linter in list(LINTERS.items()):
         module = sys.modules[linter.__module__]
 
-        if module.__file__.encode('utf-8') == view.file_name().encode('utf-8'):
-            print 'SublimeLinter: reloading language:', linter.language
+        if module.__file__ == view.file_name():
+            print('SublimeLinter: reloading language:', linter.language)
             MOD_LOAD.reload_module(module)
             lint_views(linter)
             break
@@ -859,8 +859,8 @@ class SublimelinterAnnotationsCommand(SublimelinterWindowCommand):
         if not view:
             return
 
-        text = view.substr(sublime.Region(0, view.size())).encode('utf-8')
-        filename = view.file_name().encode('utf-8')
+        text = view.substr(sublime.Region(0, view.size()))
+        filename = view.file_name()
         notes = linter.extract_annotations(text, view, filename)
         _, filename = os.path.split(filename)
         annotations_view, _id = view_in_tab(view, 'Annotations from {0}'.format(filename), notes, '')
