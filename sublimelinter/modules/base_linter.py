@@ -328,7 +328,7 @@ class BaseLinter(object):
     def find_file(self, filename, view):
         '''Find a file with the given name, starting in the view's directory,
            then ascending the file hierarchy up to root.'''
-        path = view.file_name().encode('utf-8')
+        path = (view.file_name() or '').encode('utf-8')
 
         # quit if the view is temporary
         if not path:
