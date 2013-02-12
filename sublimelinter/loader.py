@@ -51,8 +51,6 @@ class Loader(object):
 
     def load_all(self):
         '''loads all existing linter modules'''
-        print(glob.glob('{0}/{1}/*.py'.format(self.basedir, self.basepath)))
-
         for modf in glob.glob('{0}/{1}/*.py'.format(self.basedir, self.basepath)):
             base, name = os.path.split(modf)
             name = name.split('.', 1)[0]
