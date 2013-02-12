@@ -53,6 +53,7 @@ CONFIG = {
     'language': 'Python'
 }
 
+
 class PythonLintError(pyflakes.messages.Message):
 
     def __init__(self, filename, loc, level, message, message_args, offset=None, text=None):
@@ -60,8 +61,10 @@ class PythonLintError(pyflakes.messages.Message):
         self.level = level
         self.message = message
         self.message_args = message_args
-        if offset is not None: self.offset = offset
-        if text is not None: self.text = text
+        if offset is not None:
+            self.offset = offset
+        if text is not None:
+            self.text = text
 
 
 class Pep8Error(PythonLintError):
