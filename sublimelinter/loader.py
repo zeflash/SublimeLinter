@@ -6,6 +6,7 @@ import os
 import os.path
 import sys
 
+from imp import reload
 from .modules import base_linter as base_linter
 
 # sys.path appears to ignore individual paths with unicode characters.
@@ -17,19 +18,6 @@ libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'modules', '
 if libs_path not in sys.path:
     sys.path.insert(0, libs_path)
 
-# As a fix for the Windows 7 lib path issue (#181), the individual modules in
-# the `libs` folder can be explicitly imported. This obviously doesn't scale
-# well, but may be a necessary evil until ST2 upgrades its internal Python.
-#
-# tmpdir = os.getcwd()
-# os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), 'modules', 'libs')))
-
-# for mod in ['capp_lint', 'pep8', 'pyflakes', 'pyflakes.checker', 'pyflakes.messages']:
-#     __import__(mod)
-#     print('imported {0}'.format(mod))
-
-# os.chdir(tmpdir)
-
 
 class Loader(object):
     '''utility class to load (and reload if necessary) SublimeLinter modules'''
@@ -38,8 +26,8 @@ class Loader(object):
         self.basedir = basedir
         self.basepath = 'sublimelinter/modules'
         self.linters = linters
-        self.modpath = self.basepath.replace('/', '.')
-        self.ignored = ('__init__', 'base_linter')
+        self.modpath = 'SublimeLinter.sublimelinter.modules'
+        self.ignored = ('__init__', 'base_linter', 'objective-j', 'python')
         self.fix_path()
         self.load_all()
 
@@ -63,7 +51,9 @@ class Loader(object):
 
     def load_all(self):
         '''loads all existing linter modules'''
-        for modf in glob.glob('{0}/*.py'.format(self.basepath)):
+        print(glob.glob('{0}/{1}/*.py'.format(self.basedir, self.basepath)))
+
+        for modf in glob.glob('{0}/{1}/*.py'.format(self.basedir, self.basepath)):
             base, name = os.path.split(modf)
             name = name.split('.', 1)[0]
 
