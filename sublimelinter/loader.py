@@ -24,7 +24,7 @@ import modules.base_linter as base_linter
 tmpdir = os.getcwdu()
 os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__.encode('utf-8')), u'modules', u'libs')))
 
-for mod in [u'capp_lint', u'pep8', u'pyflakes', u'pyflakes.checker', u'pyflakes.messages']:
+for mod in [u'capp_lint', u'pep8', u'pyflakes', u'pyflakes.api', u'pyflakes.checker', u'pyflakes.messages', u'pyflakes.reporter']:
     __import__(mod)
     print u'imported {0}'.format(mod)
 

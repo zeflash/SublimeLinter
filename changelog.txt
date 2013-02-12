@@ -428,3 +428,21 @@ CHANGES/FIXES
 
 - Fixed issue #298: C linter throws "KeyError"
 
+
+SublimeLinter 1.6.13 changelog
+==============================
+
+CHANGES/FIXES
+
+- Updated PEP8 to version v1.4
+
+- Updated PyFlakes to v0.6.0
+
+- Updated CSSLint to v0.9.10
+
+- Update JSHint to r12
+
+- Update JSLint to latest
+
+- Fixed issues with attempting to encode file name when using 
+  scratch space.
