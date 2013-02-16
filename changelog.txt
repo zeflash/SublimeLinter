@@ -436,11 +436,11 @@ CHANGES/FIXES
 
 - Updated PEP8 to version v1.4
 
-- Updated PyFlakes to v0.6.0
+- Updated PyFlakes to v0.6.1
 
 - Updated CSSLint to v0.9.10
 
-- Update JSHint to r12
+- Update JSHint to v1.0.0
 
 - Update JSLint to latest
 
