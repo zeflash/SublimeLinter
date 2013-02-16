@@ -163,8 +163,6 @@ class Linter(BaseLinter):
                     if code in self.expected:
                         return
 
-                    if self.print_filename and not self.file_errors:
-                        print(self.filename)
                     self.file_errors += 1
                     self.total_errors += 1
 
