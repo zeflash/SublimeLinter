@@ -145,23 +145,39 @@ class Linter(BaseLinter):
         _lines = code.split('\n')
 
         if _lines:
-            def report_error(self, line_number, offset, text, check):
-                code = super(pep8.StandardReport, self).error(line_number, offset, text, check)
+            class SublimeLinterReport(pep8.BaseReport):
+                def error(self, line_number, offset, text, check):
+                    """Report an error, according to options."""
+                    code = text[:4]
+                    message = text[5:]
 
-                if not code:
-                    return
+                    if self._ignore_code(code):
+                        return
+                    if code in self.counters:
+                        self.counters[code] += 1
+                    else:
+                        self.counters[code] = 1
+                        self.messages[code] = message
 
-                msg = text[5:]
+                    # Don't care about expected errors or warnings
+                    if code in self.expected:
+                        return
 
-                if code.startswith('E'):
-                    messages.append(Pep8Error(filename, line_number, offset, code, msg))
-                else:
-                    messages.append(Pep8Warning(filename, line_number, offset, code, msg))
+                    if self.print_filename and not self.file_errors:
+                        print(self.filename)
+                    self.file_errors += 1
+                    self.total_errors += 1
 
-            pep8.Checker.report_error = report_error
+                    if code.startswith('E'):
+                        messages.append(Pep8Error(filename, line_number, offset, code, message))
+                    else:
+                        messages.append(Pep8Warning(filename, line_number, offset, code, message))
+
+                    return code
+
             _ignore = ignore + pep8.DEFAULT_IGNORE.split(',')
 
-            options = pep8.StyleGuide(reporter = pep8.StandardReport, ignore=_ignore).options
+            options = pep8.StyleGuide(reporter=SublimeLinterReport, ignore=_ignore).options
             options.max_line_length = pep8.MAX_LINE_LENGTH
 
             good_lines = [l + '\n' for l in _lines]
